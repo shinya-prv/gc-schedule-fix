@@ -4,6 +4,6 @@
  * - FRONTEND_URL: このVercelアプリ自体の本番URL（末尾スラッシュなし）。
  */
 window.APP_CONFIG = {
-  GAS_API_URL: 'https://script.google.com/macros/s/AKfycbxImjDdxmvFPK84bBlYO_iBB3PGEI-W4hw4E7H497Uo70fL6b6AbgsG2rV_IqXRFXps/exec',
+  GAS_API_URL: 'https://script.google.com/macros/s/AKfycbwYG1eE1BoyZRBfZDz73wCAoKQrYZWLGX_0riUxwJIFv7o0BAZl4ZMgs-Clrttq8Xq0/exec',
   FRONTEND_URL: 'https://gc-schedule-fix.vercel.app',
 };
