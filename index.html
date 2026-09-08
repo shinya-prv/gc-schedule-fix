@@ -982,14 +982,14 @@ function calGetTimeSlots(){
   }
   return slots;
 }
-// 対象週があればその週の月〜土（日曜始まりの場合は月曜にずらす）、無ければ今日から2週間分を返す
+// 対象週があれば その週の月曜〜土曜（6日間・日曜日は選択対象外）、
+// 無ければ今日から2週間分を返す。対象週の起点はシート上は日曜日で入っているため、
+// weekStartMonday でその翌日（月曜日）まで進めてから6日分を並べる。
 function calGetDays(targetWeekIso){
   const days = [];
   if (targetWeekIso) {
-    const m = String(targetWeekIso).match(/^(\d{4}-\d{2}-\d{2})/);
-    let start = new Date((m ? m[1] : targetWeekIso) + 'T00:00:00');
-    if (!isNaN(start.getTime())) {
-      if (start.getDay() === 0) start = new Date(start.getTime() + 24 * 60 * 60 * 1000);
+    const start = weekStartMonday(targetWeekIso);
+    if (start) {
       for (let i = 0; i < 6; i++) days.push(new Date(start.getTime() + i * 24 * 60 * 60 * 1000));
       return days;
     }
@@ -1184,31 +1184,41 @@ function fmtSlot(s){
 // その週の月曜日〜土曜日を "YYYY/M/D(曜)〜M/D(曜)" 形式に変換する。
 // サーバー側で正規化されずに "2026-07-04T15:00:00.000Z" のような日時文字列が来た場合に備え、
 // 念のため日付部分だけを抜き出してから処理する（保険的な二重対策）。
+// 対象週は「日曜日〜土曜日」の7日間として扱う。外部シートの開始週は日曜日で入っている
+// ことが多いが、週の途中の日付が入っていても正しく判定できるよう、必ずその日を含む週の
+// 日曜日まで巻き戻してから週の起点とする。表示・カレンダーの範囲はすべてこの関数を通す。
+function weekStartSunday(isoDate){
+  if (!isoDate) return null;
+  const m = String(isoDate).match(/^(\d{4}-\d{2}-\d{2})/);
+  const start = new Date((m ? m[1] : isoDate) + 'T00:00:00');
+  if (isNaN(start.getTime())) return null;
+  return new Date(start.getTime() - start.getDay() * 24 * 60 * 60 * 1000);
+}
+
 function formatTargetWeek(isoDate){
   if (!isoDate) return '';
-  const m = String(isoDate).match(/^(\d{4}-\d{2}-\d{2})/);
-  const dateOnly = m ? m[1] : isoDate;
-  const start = new Date(dateOnly + 'T00:00:00');
-  if (isNaN(start.getTime())) return isoDate;
-  const end = new Date(start.getTime() + 5 * 24 * 60 * 60 * 1000); // 月曜+5日=土曜
+  const start = weekStartSunday(isoDate);
+  if (!start) return isoDate;
+  const end = new Date(start.getTime() + 6 * 24 * 60 * 60 * 1000); // 日曜+6日=土曜
   const fmtFull = (d) => d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + '(' + DAY_LABELS[d.getDay()] + ')';
   const fmtShort = (d) => (d.getMonth() + 1) + '/' + d.getDate() + '(' + DAY_LABELS[d.getDay()] + ')';
   return fmtFull(start) + '〜' + fmtShort(end);
 }
 
-// 生徒画面にだけ使う表示用フォーマット。外部シートの「通常開始週」が日曜日で入っていることがあり、
-// 日曜日は休みのため、生徒への案内では開始日が日曜日なら1日ずらして月曜日として表示する
-// （管理画面側の表示・アラート判定などには影響させず、生徒向けの見た目だけを調整する）。
+// 生徒・コーチが実際に日程を選べるのは月曜日〜土曜日（日曜日は対象外）。
+// 対象週の起点（日曜日）の翌日を、選択できる週の初日として返す。
+function weekStartMonday(isoDate){
+  const sunday = weekStartSunday(isoDate);
+  return sunday ? new Date(sunday.getTime() + 24 * 60 * 60 * 1000) : null;
+}
+
+// 生徒画面の表示用。管理画面は対象週を「日曜日〜土曜日」で表すが、生徒・コーチが
+// 実際に選べるのは月曜日〜土曜日のため、案内する範囲もそれに合わせる。
 function formatTargetWeekForStudent(isoDate){
   if (!isoDate) return '';
-  const m = String(isoDate).match(/^(\d{4}-\d{2}-\d{2})/);
-  const dateOnly = m ? m[1] : isoDate;
-  let start = new Date(dateOnly + 'T00:00:00');
-  if (isNaN(start.getTime())) return isoDate;
-  if (start.getDay() === 0) { // 日曜日なら1日ずらして月曜日にする
-    start = new Date(start.getTime() + 24 * 60 * 60 * 1000);
-  }
-  const end = new Date(start.getTime() + 5 * 24 * 60 * 60 * 1000);
+  const start = weekStartMonday(isoDate);
+  if (!start) return isoDate;
+  const end = new Date(start.getTime() + 5 * 24 * 60 * 60 * 1000); // 月曜+5日=土曜
   const fmtFull = (d) => d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + '(' + DAY_LABELS[d.getDay()] + ')';
   const fmtShort = (d) => (d.getMonth() + 1) + '/' + d.getDate() + '(' + DAY_LABELS[d.getDay()] + ')';
   return fmtFull(start) + '〜' + fmtShort(end);
