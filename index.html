@@ -95,6 +95,11 @@
           <span class="material-icons-round text-base leading-none">switch_account</span>
           コーチ変更対応リスト
         </button>
+        <button id="courseChangeCoachListBtn" type="button"
+           class="items-center gap-1 px-3 py-2 rounded-full border border-white/30 text-white text-xs font-bold hover:bg-white/10 active:scale-[.97] transition">
+          <span class="material-icons-round text-base leading-none">move_up</span>
+          コース変更に伴うコーチ変更対応リスト
+        </button>
         <a id="crmLink" href="https://gc-crm-two.vercel.app/" target="_blank" rel="noopener"
            class="items-center gap-1 px-3 py-2 rounded-full border border-white/30 text-white text-xs font-bold hover:bg-white/10 active:scale-[.97] transition">
           <span class="material-icons-round text-base leading-none">sync</span>
@@ -127,6 +132,28 @@
         <span class="material-icons-round text-4xl text-cta">error_outline</span>
         <p class="font-bold" id="errorTitle">リンクが無効です</p>
         <p class="text-sm text-dark/60" id="errorMsg">URLをご確認のうえ、再度お試しください。</p>
+      </section>
+
+      <!-- ===== 生徒: 前任コーチ確認（コーチ変更に伴う調整の場合のみ表示） ===== -->
+      <section id="screen-student-coach-confirm" class="hidden fade-in px-4 md:px-10 py-5 md:py-8 space-y-5">
+        <div class="bg-light/50 border border-light rounded-xl p-4">
+          <p class="text-xs text-main font-bold mb-1">担当コーチ変更のお知らせ</p>
+          <p class="text-sm text-dark/80"><span id="scStudentName">—</span> さん、コーチ変更に伴うご案内です。内容をご確認のうえ、日程調整へお進みください。</p>
+        </div>
+        <div class="bg-white border border-light rounded-xl p-4 space-y-3 text-sm">
+          <div class="flex items-start gap-2">
+            <span class="material-icons-round text-sub text-lg shrink-0">event_busy</span>
+            <p class="text-dark/80"><span id="scLastWeek">—</span>の週までは、これまで通り <span class="font-bold" id="scOldCoachName">—</span> コーチとのコーチングにご参加ください。</p>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="material-icons-round text-main text-lg shrink-0">event_available</span>
+            <p class="text-dark/80"><span id="scNewStartWeek">—</span>の週から、新しいコーチとのコーチングが始まります。</p>
+          </div>
+        </div>
+        <button id="scProceedBtn" type="button"
+          class="w-full py-3.5 rounded-xl bg-main text-white font-bold text-sm shadow-md hover:brightness-105 active:scale-[.98] transition flex items-center justify-center gap-1.5">
+          <span class="material-icons-round text-base">check_circle</span>確認して、日程調整へ進む
+        </button>
       </section>
 
       <!-- ===== 生徒: 希望日時入力フォーム ===== -->
@@ -654,6 +681,43 @@
     </div>
   </div>
 
+  <!-- コース変更に伴うコーチ変更対応リスト モーダル -->
+  <div id="courseChangeCoachListModal" class="hidden fixed inset-0 z-50">
+    <div id="courseChangeCoachListBackdrop" class="absolute inset-0 bg-dark/60"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-3 md:p-6">
+      <div class="relative bg-white w-full max-w-3xl h-[88vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+        <div class="flex items-center justify-between px-4 py-3 bg-dark text-white shrink-0">
+          <p class="font-bold text-sm flex items-center gap-2"><span class="material-icons-round text-base">move_up</span>コース変更に伴うコーチ変更対応リスト</p>
+          <button id="closeCourseChangeCoachListBtn" class="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition">
+            <span class="material-icons-round">close</span>
+          </button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-4 bg-[#EEF3F5]">
+          <p class="text-[11px] text-dark/40 mb-3">外部「コース変更_fix」シートのうち、変更フラグ（M列）に「コーチ追加」または「コーチ除外」が入っている行のみ表示しています（単なるコース変更は対象外）。新コース開始週（J列）の早い順に並んでいます（日付未設定は最後）。</p>
+          <div id="courseChangeCoachListContent" class="space-y-2 text-sm"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 汎用の詳細テキスト表示モーダル（コース変更詳細／コーチ変更詳細のポップアップ表示に共用） -->
+  <div id="textDetailModal" class="hidden fixed inset-0 z-[60]">
+    <div id="textDetailBackdrop" class="absolute inset-0 bg-dark/60"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-3 md:p-6">
+      <div class="relative bg-white w-full max-w-lg max-h-[80vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+        <div class="flex items-center justify-between px-4 py-3 bg-dark text-white shrink-0">
+          <p class="font-bold text-sm flex items-center gap-2" id="textDetailTitle"><span class="material-icons-round text-base">description</span>詳細</p>
+          <button id="closeTextDetailBtn" class="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition">
+            <span class="material-icons-round">close</span>
+          </button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-4 bg-[#EEF3F5]">
+          <p class="text-sm text-dark/80 whitespace-pre-wrap" id="textDetailBody">—</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- 起票確認モーダル（コーチへの引き継ぎ事項を入力できる） -->
   <div id="createConfirmModal" class="hidden fixed inset-0 z-50">
     <div id="createConfirmBackdrop" class="absolute inset-0 bg-dark/60"></div>
@@ -809,7 +873,7 @@ function apiPost(action, payload) {
 
 // ========================= 画面ルーティング =========================
 const $ = (id) => document.getElementById(id);
-const narrowScreens = ['loading','error','student-form','student-thanks','coach-form','coach-thanks','confirm'];
+const narrowScreens = ['loading','error','student-coach-confirm','student-form','student-thanks','coach-form','coach-thanks','confirm'];
 
 // Tailwindの `hidden` クラス(display:none)は、adminWrapのように `md:flex` など
 // レスポンシブな表示クラスを併用している要素だと、画面幅によっては上書きされてしまう
@@ -1118,7 +1182,7 @@ let currentRole = 'admin';
 function updateAdminOnlyButtonsVisibility(){
   const isAdmin = currentRole === 'admin';
   const visibleDisplay = window.matchMedia('(min-width: 640px)').matches ? 'flex' : 'none';
-  ['crmLink', 'fixListBtn', 'coachChangeListBtn'].forEach((id) => {
+  ['crmLink', 'fixListBtn', 'coachChangeListBtn', 'courseChangeCoachListBtn'].forEach((id) => {
     $(id).style.display = isAdmin ? visibleDisplay : 'none';
   });
 }
@@ -1238,15 +1302,21 @@ $('coachChangeListBtn').onclick = openCoachChangeList;
 $('closeCoachChangeListBtn').onclick = closeCoachChangeList;
 $('coachChangeListBackdrop').onclick = closeCoachChangeList;
 
-// 初回FIXリスト／コーチ変更対応リストの「この内容で起票する」ボタンから呼ばれる。
-// モーダルを閉じて新規起票タブへ切り替え、面談種別・対象の生徒・担当コーチ（候補の1人目）・
-// 外部シートの組み合わせまで自動入力し、あとは起票ボタンを押すだけの状態にする。
-function prefillCreateFromListRow(row, typeId){
+// 初回FIXリスト／コーチ変更対応リスト／コース変更対応リストの「この内容で起票する」ボタンから呼ばれる。
+// モーダルを閉じて新規起票タブへ切り替え、面談種別・対象の生徒・担当コーチ（候補の1人目）まで
+// 自動入力し、あとは起票ボタンを押すだけの状態にする。
+// c-0002／c-0003／c-0004はいずれも外部シートの組み合わせ選択が必須で、
+// pendingComboRowNumber経由で対応する行を自動選択する（生徒を選んだ瞬間に候補を再取得するため、
+// 一覧を開いてから時間が経って行が削除されても、古い行番号のまま書き込まれることはない）。
+function prefillCreateFromListRow(row, typeId, options){
+  options = options || {};
   closeFixList();
   closeCoachChangeList();
+  closeCourseChangeCoachList();
   switchAdminTab('create');
 
   $('newType').value = typeId;
+
   // renderExternalCombos内で、この行番号と一致する組み合わせを自動選択する
   pendingComboRowNumber = row.rowNumber;
 
@@ -1260,7 +1330,8 @@ function prefillCreateFromListRow(row, typeId){
   }
 
   // 担当コーチは候補の1人目のみを自動選択する
-  const firstCoachName = (row.candidateCoach || '').split(/[,、\/]/)[0].trim();
+  const candidateNames = options.candidateCoachNames !== undefined ? options.candidateCoachNames : row.candidateCoach;
+  const firstCoachName = (candidateNames || '').split(/[,、\/]/)[0].trim();
   if (firstCoachName) {
     const coachMatched = coachCombo.selectByName(firstCoachName);
     if (!coachMatched) {
@@ -1268,14 +1339,175 @@ function prefillCreateFromListRow(row, typeId){
     }
   }
 
-  showToast('起票フォームに内容を入力しました。内容を確認して起票してください。');
+  showToast('起票フォームに内容を入力しました。組み合わせを確認して起票してください。');
 }
+
+// ========================= コース変更に伴うコーチ変更対応リスト モーダル =========================
+function openCourseChangeCoachList(){
+  $('courseChangeCoachListModal').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  $('courseChangeCoachListContent').innerHTML = '<p class="text-xs text-dark/40 py-6 text-center">読み込み中…</p>';
+  apiGet('getCourseChangeCoachRows')
+    .then((rows) => renderCourseChangeCoachList(rows))
+    .catch((err) => {
+      $('courseChangeCoachListContent').innerHTML = '<p class="text-xs text-cta font-bold py-6 text-center">読み込みに失敗しました: ' + err.message + '</p>';
+    });
+}
+function closeCourseChangeCoachList(){
+  $('courseChangeCoachListModal').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+function renderCourseChangeCoachList(rows){
+  const box = $('courseChangeCoachListContent');
+  if (!rows || rows.length === 0) {
+    box.innerHTML = '<p class="text-xs text-dark/40 py-6 text-center">コーチ変更を伴うコース変更（変更フラグあり）の行はありません。</p>';
+    return;
+  }
+  box.innerHTML = '';
+  rows.forEach((r) => {
+    const flagBadges = [];
+    if (r.hasAdd) flagBadges.push('<span class="inline-block px-2 py-0.5 rounded-full bg-main/10 text-main text-[11px] font-bold">コーチ追加</span>');
+    if (r.hasRemove) flagBadges.push('<span class="inline-block px-2 py-0.5 rounded-full bg-cta/10 text-cta text-[11px] font-bold">コーチ除外</span>');
+
+    const card = document.createElement('div');
+    card.className = 'bg-white border border-light rounded-lg p-3';
+    let html =
+      '<div class="flex items-center justify-between gap-2">' +
+      '<p class="font-bold text-sm">' + (r.newCourseStartWeek ? formatTargetWeek(r.newCourseStartWeek) : '（開始週未設定）') + '</p>' +
+      '<p class="text-dark/50 text-xs shrink-0">' + r.studentName + '（' + r.studentCode + '）</p>' +
+      '</div>' +
+      '<p class="text-dark/70 text-xs mt-1">' + (r.oldCourse || '—') + ' → ' + (r.newCourse || '—') + '</p>' +
+      '<p class="text-dark/50 text-xs">受験科目: ' + (r.examSubjects || '—') + '</p>' +
+      '<div class="flex items-center gap-1.5 mt-1.5">' + flagBadges.join('') + '</div>';
+
+    // コーチ変更対応リスト（c-0003）と同様、生徒マスタの学年・志望校・コースを
+    // 起票前の時点で確認できるようにする（1件も無ければブロック自体を出さない）。
+    if (r.studentGrade || r.studentDesiredSchool || r.studentCourse) {
+      html +=
+        '<div class="mt-2 pt-2 border-t border-light/70">' +
+        '<p class="text-[11px] font-bold text-sub mb-0.5">生徒情報</p>' +
+        (r.studentGrade ? '<p class="text-dark/50 text-xs">学年: ' + r.studentGrade + '</p>' : '') +
+        (r.studentDesiredSchool ? '<p class="text-dark/50 text-xs">志望校: ' + r.studentDesiredSchool + '</p>' : '') +
+        (r.studentCourse ? '<p class="text-dark/50 text-xs">コース: ' + r.studentCourse + '</p>' : '') +
+        '</div>';
+    }
+
+    if (r.hasAdd) {
+      html +=
+        '<div class="mt-2 pt-2 border-t border-light/70">' +
+        '<p class="text-[11px] font-bold text-main mb-0.5">新コーチ情報</p>' +
+        '<p class="text-main text-xs">新コーチ候補: ' + (r.newCoachCandidate || '—') + '</p>' +
+        '<p class="text-dark/50 text-xs">指導内容: ' + (r.newCoachContent || '—') + '</p>' +
+        '<p class="text-dark/50 text-xs">新コーチ指導科目: ' + (r.newCoachSubject || '—') + '</p>' +
+        '</div>';
+    }
+    if (r.hasRemove) {
+      html +=
+        '<div class="mt-2 pt-2 border-t border-light/70">' +
+        '<p class="text-[11px] font-bold text-cta mb-0.5">旧コーチ情報</p>' +
+        '<p class="text-dark/50 text-xs">管理ID: ' + (r.managementId || '—') + '</p>' +
+        '<p class="text-dark/50 text-xs">旧コーチ氏名: ' + (r.oldCoachName || '—') + '</p>' +
+        '</div>';
+    }
+
+    html +=
+      '<div class="flex gap-2 mt-2">' +
+      '<button class="courseDetailBtn flex-1 py-1.5 rounded-lg border border-light text-dark/70 text-xs font-bold hover:bg-light/40 active:scale-[.98] transition flex items-center justify-center gap-1">' +
+      '<span class="material-icons-round text-sm">description</span>コース変更詳細</button>' +
+      '<button class="coachDetailBtn flex-1 py-1.5 rounded-lg border border-light text-dark/70 text-xs font-bold hover:bg-light/40 active:scale-[.98] transition flex items-center justify-center gap-1">' +
+      '<span class="material-icons-round text-sm">description</span>コーチ変更詳細</button>' +
+      '</div>';
+
+    const actionButtons = [];
+    if (r.hasAdd) {
+      // コーチ追加を含む場合は、承認後に自動で担当終了メールが送られるため、
+      // このリストからの手動送信ボタンは不要にし、「起票」だけできるようにする。
+      actionButtons.push(
+        '<button class="createFromListBtn flex-1 py-1.5 rounded-lg bg-main text-white text-xs font-bold hover:brightness-105 active:scale-[.98] transition flex items-center justify-center gap-1">' +
+        '<span class="material-icons-round text-sm">add_link</span>この内容で起票する</button>'
+      );
+    } else if (r.hasRemove) {
+      // コーチ除外のみの場合は、日程調整（起票）が発生しないため、このボタンから
+      // 生徒・旧コーチへ直接お知らせする。
+      actionButtons.push(
+        '<button class="exitNoticeBtn flex-1 py-1.5 rounded-lg bg-cta text-white text-xs font-bold hover:brightness-105 active:scale-[.98] transition flex items-center justify-center gap-1">' +
+        '<span class="material-icons-round text-sm">mail</span>生徒・旧コーチへ担当終了通知を送信</button>'
+      );
+    }
+    if (actionButtons.length) {
+      html += '<div class="flex gap-2 mt-2">' + actionButtons.join('') + '</div>';
+    }
+
+    card.innerHTML = html;
+    card.querySelector('.courseDetailBtn').onclick = () => openTextDetailModal('コース変更詳細', r.courseChangeDetail);
+    card.querySelector('.coachDetailBtn').onclick = () => openTextDetailModal('コーチ変更詳細', r.coachChangeDetail);
+    if (!r.hasAdd && r.hasRemove) {
+      card.querySelector('.exitNoticeBtn').onclick = () => onSendCourseChangeExitNotice(r, card.querySelector('.exitNoticeBtn'));
+    }
+    if (r.hasAdd) {
+      card.querySelector('.createFromListBtn').onclick = () => prefillCreateFromListRow(r, COURSE_CHANGE_TYPE_ID, {
+        candidateCoachNames: r.newCoachCandidate,
+      });
+    }
+    box.appendChild(card);
+  });
+}
+$('courseChangeCoachListBtn').onclick = openCourseChangeCoachList;
+$('closeCourseChangeCoachListBtn').onclick = closeCourseChangeCoachList;
+$('courseChangeCoachListBackdrop').onclick = closeCourseChangeCoachList;
+
+// 「旧コーチへ担当終了通知を送信」ボタンから呼ばれる。旧コーチへのメール送信のみを行う
+// （生徒への案内は、生徒の日程調整リンクを開いた際の確認画面で行う）。
+// 送信前に必ず確認ダイアログを挟む。送信成功後はボタンを「送信済み」表示に変え、
+// 誤って連続クリックできないようにする。
+// 「生徒・旧コーチへ担当終了通知を送信」ボタンから呼ばれる（コーチ除外のみの行にのみ表示される）。
+// 送信前に必ず確認ダイアログを挟む。送信成功後はボタンを「送信済み」表示に変え、
+// 誤って連続クリックできないようにする。
+function onSendCourseChangeExitNotice(row, btn){
+  const confirmMsg = row.studentName + 'さん（' + row.studentCode + '）について、\n'
+    + '・旧コーチ「' + (row.oldCoachName || '—') + '」へ担当終了のお知らせメール\n'
+    + '・生徒へ「いつまで旧コーチ／いつから新体制か」の確認メール\n'
+    + 'をそれぞれ送信します。よろしいですか？';
+  if (!confirm(confirmMsg)) return;
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="material-icons-round text-sm">hourglass_top</span>送信中…';
+  apiPost('notifyCourseChangeCoachExit', { rowNumber: row.rowNumber })
+    .then(() => {
+      btn.innerHTML = '<span class="material-icons-round text-sm">check</span>送信済み';
+      btn.classList.remove('bg-cta');
+      btn.classList.add('bg-dark/30');
+      showToast('旧コーチ・生徒へ担当終了通知を送信しました（進行中の調整／未確認アラートで確認状況を追えます）');
+      loadDashboard();
+    })
+    .catch((err) => {
+      btn.disabled = false;
+      btn.innerHTML = '<span class="material-icons-round text-sm">mail</span>生徒・旧コーチへ担当終了通知を送信';
+      showToast('送信に失敗しました: ' + err.message, true);
+    });
+}
+
+// ========================= 汎用の詳細テキスト表示モーダル =========================
+function openTextDetailModal(title, text){
+  $('textDetailTitle').innerHTML = '<span class="material-icons-round text-base">description</span>' + title;
+  $('textDetailBody').textContent = text || '（内容が入力されていません）';
+  $('textDetailModal').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function closeTextDetailModal(){
+  $('textDetailModal').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+$('closeTextDetailBtn').onclick = closeTextDetailModal;
+$('textDetailBackdrop').onclick = closeTextDetailModal;
 
 document.addEventListener('keydown', (e) => {
   if (e.key !== 'Escape') return;
   closeManual();
   closeFixList();
   closeCoachChangeList();
+  closeCourseChangeCoachList();
+  closeTextDetailModal();
   closeApproveModal();
   closeProgressDetail();
   closeCreateConfirmModal();
@@ -1423,7 +1655,19 @@ function initStudent(cid){
       calWireScrollButtons('stuCalendarScrollWrap', 'stuCalScrollUpBtn', 'stuCalScrollDownBtn');
       updateStudentSelectionSummary();
 
-      show('student-form');
+      // コーチ変更を伴う調整（c-0003、またはc-0004でコーチ除外を含む場合）は、
+      // 日程選択の前に「いつまで旧コーチ／いつから新コーチか」を確認してもらう画面を挟む。
+      // 一度確認すれば、日程選択画面（screen-student-form）にそのまま進める。
+      if (data.departingCoach) {
+        $('scStudentName').textContent = data.studentName;
+        $('scOldCoachName').textContent = data.departingCoach.oldCoachName;
+        $('scLastWeek').textContent = data.departingCoach.lastWeekLabel || '（未設定）';
+        $('scNewStartWeek').textContent = data.departingCoach.newStartWeekLabel || '（未設定）';
+        $('scProceedBtn').onclick = () => show('student-form');
+        show('student-coach-confirm');
+      } else {
+        show('student-form');
+      }
     })
     .catch((err) => showError('読み込みに失敗しました', err.message));
 
@@ -1970,14 +2214,22 @@ const COACH_INITIATED_TYPE_ID = 'c-0002';
 // 「運営_生徒面談」の種別ID。コーチ変更対応のため、外部シート（コーチ変更_fix）との組み合わせ選択が必須になる。
 // ※ コード.gs の CONFIG.COACH_CHANGE_TYPE_ID と必ず同じ値にすること。
 const COACH_CHANGE_TYPE_ID = 'c-0003';
+// 「コース変更に伴うコーチ変更」の種別ID。こちらは外部シートとの組み合わせ選択は必須にしない
+// （コース変更_fixリストの「起票」ボタンから、対象週・担当コーチをあらかじめ入力した状態で起票する）。
+// ※ コード.gs の CONFIG.COURSE_CHANGE_TYPE_ID と必ず同じ値にすること。
+const COURSE_CHANGE_TYPE_ID = 'c-0004';
+// 「コース変更対応リスト」の「担当終了通知を送信」（コーチ除外のみ）から作られた起票データの
+// 「起票者」列に入る目印。この起票かどうかを判定し、表示ラベルを出し分けるために使う。
+// ※ コード.gs の CONFIG.COURSE_CHANGE_EXIT_NOTICE_CREATED_BY と必ず同じ値にすること。
+const COURSE_CHANGE_EXIT_NOTICE_CREATED_BY = '（コース変更_fixリストより自動作成）';
 let selectedExternalCombo = null;
-// 一覧モーダル（初回FIXリスト／コーチ変更対応リスト）から「起票」ボタンで遷移してきた場合、
-// 組み合わせ一覧が読み込まれた時点で自動選択すべき行番号を一時的に保持する。
+// 一覧モーダル（初回FIXリスト／コーチ変更対応リスト／コース変更対応リスト）から「起票」ボタンで
+// 遷移してきた場合、組み合わせ一覧が読み込まれた時点で自動選択すべき行番号を一時的に保持する。
 let pendingComboRowNumber = null;
 
 const studentCombo = setupCombobox({
   searchInputId: 'newStudentSearch', hiddenInputId: 'newStudentId', dropdownId: 'studentDropdown',
-  formatLabel: (s) => s.name + '（' + s.id + ' / ' + s.grade + '）',
+  formatLabel: (s) => s.name + '（' + s.id + (s.grade ? ' / ' + s.grade : '') + '）',
   onSelect: () => refreshExternalCombos(),
 });
 const coachCombo = setupCombobox({
@@ -2075,14 +2327,16 @@ function refreshExternalCombos(){
   const typeId = $('newType').value;
   const studentId = $('newStudentId').value;
   const section = $('externalComboSection');
-  const requiresCombo = (typeId === COACH_INITIATED_TYPE_ID) || (typeId === COACH_CHANGE_TYPE_ID);
+  const requiresCombo = (typeId === COACH_INITIATED_TYPE_ID) || (typeId === COACH_CHANGE_TYPE_ID) || (typeId === COURSE_CHANGE_TYPE_ID);
 
   section.classList.toggle('hidden', !requiresCombo);
   $('newTargetWeek').disabled = requiresCombo;
   $('newTargetWeekHint').textContent = requiresCombo
     ? 'この種別では、下で選択した組み合わせの対象週が自動設定されます。'
     : '初回コーチングなど、実施週が決まっている場合にその週の開始日（月曜日など）を選択してください。生徒画面の案内、および管理画面のアラート判定に使用されます。';
-  $('externalComboSourceLabel').textContent = (typeId === COACH_CHANGE_TYPE_ID) ? 'コーチ変更_fix' : '通常FIX';
+  $('externalComboSourceLabel').textContent =
+    (typeId === COACH_CHANGE_TYPE_ID) ? 'コーチ変更_fix' :
+    (typeId === COURSE_CHANGE_TYPE_ID) ? 'コース変更_fix' : '通常FIX';
 
   if (!requiresCombo) {
     selectedExternalCombo = null;
@@ -2148,7 +2402,7 @@ function renderExternalCombos(combos){
 function updateCreateButtonState(){
   const typeId = $('newType').value;
   const btn = $('createBtn');
-  const requiresCombo = (typeId === COACH_INITIATED_TYPE_ID) || (typeId === COACH_CHANGE_TYPE_ID);
+  const requiresCombo = (typeId === COACH_INITIATED_TYPE_ID) || (typeId === COACH_CHANGE_TYPE_ID) || (typeId === COURSE_CHANGE_TYPE_ID);
   btn.disabled = requiresCombo && !selectedExternalCombo;
 }
 
@@ -2165,7 +2419,7 @@ function onCreateAssignment(){
   if (!typeId) return showToast('面談種別を選択してください', true);
 
   let externalRowNumber = null;
-  if ((typeId === COACH_INITIATED_TYPE_ID) || (typeId === COACH_CHANGE_TYPE_ID)) {
+  if ((typeId === COACH_INITIATED_TYPE_ID) || (typeId === COACH_CHANGE_TYPE_ID) || (typeId === COURSE_CHANGE_TYPE_ID)) {
     if (!selectedExternalCombo) return showToast('外部シートの組み合わせを選択してください', true);
     externalRowNumber = selectedExternalCombo.rowNumber;
     targetWeek = selectedExternalCombo.startWeek;
@@ -2272,6 +2526,8 @@ function renderPending(items){
       (it.createdBy ? '<p class="text-dark/40">起票者: ' + it.createdBy + '</p>' : '') +
       '<p class="text-main font-bold">' + (it.slot ? fmtSlot(it.slot) : '（時間未取得）') + '</p>' +
       '<button class="showLinksLinkBtn text-[11px] text-sub font-bold flex items-center gap-0.5 mt-1"><span class="material-icons-round text-sm">link</span>リンクを表示</button>' +
+      (it.courseChangeDetail ? '<button class="pendingCourseDetailBtn text-[11px] text-sub font-bold flex items-center gap-0.5 mt-1"><span class="material-icons-round text-sm">description</span>コース変更詳細</button>' : '') +
+      (it.coachChangeDetail ? '<button class="pendingCoachChangeDetailBtn text-[11px] text-sub font-bold flex items-center gap-0.5 mt-1"><span class="material-icons-round text-sm">description</span>コーチ変更詳細</button>' : '') +
       '</div>' +
       '<div class="shrink-0 flex flex-col items-end gap-1.5">' +
       '<button class="approveBtn px-3 py-2 rounded-lg bg-cta text-white text-xs font-bold hover:brightness-105">承認</button>' +
@@ -2280,6 +2536,10 @@ function renderPending(items){
     card.querySelector('.approveBtn').onclick = () => openApproveModal(it.cid, card);
     card.querySelector('.showLinksLinkBtn').onclick = () => openLinksModal(it.cid);
     card.querySelector('.cancelBtn').onclick = () => cancelAssignmentPrompt(it.cid, () => card.remove());
+    const pendingCourseDetailBtn = card.querySelector('.pendingCourseDetailBtn');
+    if (pendingCourseDetailBtn) pendingCourseDetailBtn.onclick = () => openTextDetailModal('コース変更詳細', it.courseChangeDetail);
+    const pendingCoachChangeDetailBtn = card.querySelector('.pendingCoachChangeDetailBtn');
+    if (pendingCoachChangeDetailBtn) pendingCoachChangeDetailBtn.onclick = () => openTextDetailModal('コーチ変更詳細', it.coachChangeDetail);
     wrap.appendChild(card);
   });
 }
@@ -2346,22 +2606,37 @@ function renderAlerts(items){
     const daysLabel = (it.overdueDays !== null && it.overdueDays !== undefined)
       ? (it.overdueDays > 0 ? (it.overdueDays + '日超過') : (Math.abs(it.overdueDays) + '日前'))
       : (it.daysSinceFixed !== null && it.daysSinceFixed !== undefined ? ('確定連絡から' + it.daysSinceFixed + '日経過') : '');
+    // 「コース変更対応リスト」の「担当終了通知を送信」（コーチ除外のみ）から作られた起票は、
+    // ENTRIES上の「コーチ」が実質「旧コーチ」を指すため、表示ラベルもそれに合わせる。
+    const isCourseChangeExitNotice = it.typeId === COURSE_CHANGE_TYPE_ID
+      && it.createdBy === COURSE_CHANGE_EXIT_NOTICE_CREATED_BY;
+    const coachLabel = isCourseChangeExitNotice ? '旧コーチ' : 'コーチ';
 
     card.className = 'bg-cta/10 border border-cta rounded-xl p-4 text-xs space-y-2';
     card.innerHTML =
       '<div class="flex items-start gap-2">' +
       '<span class="material-icons-round text-cta text-lg shrink-0">warning</span>' +
       '<div class="min-w-0 flex-1"><p class="font-bold">' + it.studentName + ' × ' + it.coachName + '</p>' +
-      '<p class="text-dark/60">確定日時: ' + (it.slot ? fmtSlot(it.slot) : '（時間未取得）') + '（対象週: ' + weekLabel + (daysLabel ? ' / ' + daysLabel : '') + '）　生徒:' + (it.studentConfirmed ? '済' : '未') + ' / コーチ:' + (it.coachConfirmed ? '済' : '未') + (it.typeId === COACH_CHANGE_TYPE_ID ? ' / 旧コーチ:' + (it.oldCoachConfirmed ? '済' : '未') : '') + '</p>' +
+      '<p class="text-dark/60">確定日時: ' + (it.slot ? fmtSlot(it.slot) : '（時間未取得）') + '（対象週: ' + weekLabel + (daysLabel ? ' / ' + daysLabel : '') + '）　生徒:' + (it.studentConfirmed ? '済' : '未') + ' / ' + coachLabel + ':' + (it.coachConfirmed ? '済' : '未') + ((!isCourseChangeExitNotice && (it.typeId === COACH_CHANGE_TYPE_ID || (it.typeId === COURSE_CHANGE_TYPE_ID && it.hasCourseChangeOldCoach))) ? ' / 旧コーチ:' + (it.oldCoachConfirmed ? '済' : '未') : '') + '</p>' +
       '<button class="showLinksLinkBtn text-[11px] text-sub font-bold flex items-center gap-0.5 mt-1"><span class="material-icons-round text-sm">link</span>リンクを表示</button>' +
       '</div>' +
       '<button class="cancelBtn shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-cta text-white hover:brightness-105 active:scale-95 transition shadow-sm" title="対応不要にする"><span class="material-icons-round text-lg">delete_outline</span></button>' +
       '</div>' +
+      (it.courseChangeDetail || it.coachChangeDetail
+        ? '<div class="flex gap-2">' +
+          (it.courseChangeDetail ? '<button class="alertCourseDetailBtn flex-1 px-2 py-1.5 rounded-lg bg-white border border-light text-dark/70 text-[11px] font-bold hover:bg-light/40 transition flex items-center justify-center gap-1"><span class="material-icons-round text-sm">description</span>コース変更詳細</button>' : '') +
+          (it.coachChangeDetail ? '<button class="alertCoachChangeDetailBtn flex-1 px-2 py-1.5 rounded-lg bg-white border border-light text-dark/70 text-[11px] font-bold hover:bg-light/40 transition flex items-center justify-center gap-1"><span class="material-icons-round text-sm">description</span>コーチ変更詳細</button>' : '') +
+          '</div>'
+        : '') +
       '<button class="resendConfirmBtn w-full px-3 py-2 rounded-lg bg-white border border-cta text-cta text-xs font-bold hover:bg-cta/10 transition flex items-center justify-center gap-1">' +
       '<span class="material-icons-round text-sm">forward_to_inbox</span>確定連絡メールを再送</button>';
 
     card.querySelector('.showLinksLinkBtn').onclick = () => openLinksModal(it.cid);
     card.querySelector('.cancelBtn').onclick = () => cancelAssignmentPrompt(it.cid, () => card.remove());
+    const alertCourseDetailBtn = card.querySelector('.alertCourseDetailBtn');
+    if (alertCourseDetailBtn) alertCourseDetailBtn.onclick = () => openTextDetailModal('コース変更詳細', it.courseChangeDetail);
+    const alertCoachChangeDetailBtn = card.querySelector('.alertCoachChangeDetailBtn');
+    if (alertCoachChangeDetailBtn) alertCoachChangeDetailBtn.onclick = () => openTextDetailModal('コーチ変更詳細', it.coachChangeDetail);
 
     const resendBtn = card.querySelector('.resendConfirmBtn');
     resendBtn.onclick = () => {
@@ -2462,7 +2737,25 @@ function openProgressDetail(it){
     lines.push('<div class="bg-sub/10 border border-sub rounded-lg p-2.5 mt-1"><p class="text-[11px] font-bold text-sub mb-0.5">コーチへの引き継ぎ事項</p><p class="whitespace-pre-wrap text-dark/80">' + it.handoverNote + '</p></div>');
   }
 
-  let actionHtml =
+  let actionHtml = '';
+  // コース変更に伴うコーチ変更（c-0004）を「コース変更対応リスト」経由で起票した場合のみ、
+  // 起票元のコース変更詳細・コーチ変更詳細をここからも確認できるようにする。
+  if (it.courseChangeDetail || it.coachChangeDetail) {
+    actionHtml += '<div class="flex gap-2 mt-3">';
+    if (it.courseChangeDetail) {
+      actionHtml +=
+        '<button id="progressCourseDetailBtn" type="button" class="flex-1 py-2 rounded-lg border border-light text-dark/70 text-xs font-bold hover:bg-light/40 transition flex items-center justify-center gap-1">' +
+        '<span class="material-icons-round text-sm">description</span>コース変更詳細</button>';
+    }
+    if (it.coachChangeDetail) {
+      actionHtml +=
+        '<button id="progressCoachChangeDetailBtn" type="button" class="flex-1 py-2 rounded-lg border border-light text-dark/70 text-xs font-bold hover:bg-light/40 transition flex items-center justify-center gap-1">' +
+        '<span class="material-icons-round text-sm">description</span>コーチ変更詳細</button>';
+    }
+    actionHtml += '</div>';
+  }
+
+  actionHtml +=
     '<button id="showLinksBtn" type="button" class="w-full mt-3 py-2.5 rounded-lg border border-light text-dark/70 text-sm font-bold hover:bg-light/30 transition flex items-center justify-center gap-1.5">' +
     '<span class="material-icons-round text-base">link</span>リンクを表示</button>';
   if (it.status === 'コーチ回答待ち') {
@@ -2481,6 +2774,11 @@ function openProgressDetail(it){
 
   $('showLinksBtn').onclick = () => { closeProgressDetail(); openLinksModal(it.cid); };
   $('cancelAssignmentBtn').onclick = () => cancelAssignmentPrompt(it.cid, closeProgressDetail);
+
+  const courseDetailBtn = document.getElementById('progressCourseDetailBtn');
+  if (courseDetailBtn) courseDetailBtn.onclick = () => openTextDetailModal('コース変更詳細', it.courseChangeDetail);
+  const coachChangeDetailBtn = document.getElementById('progressCoachChangeDetailBtn');
+  if (coachChangeDetailBtn) coachChangeDetailBtn.onclick = () => openTextDetailModal('コーチ変更詳細', it.coachChangeDetail);
 
   const btn = document.getElementById('forceNextCoachBtn');
   if (btn) {
