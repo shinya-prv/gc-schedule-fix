@@ -551,9 +551,9 @@
           <section id="panel-pending" class="admin-panel hidden fade-in">
             <div class="mb-4">
               <h2 class="text-lg font-bold text-dark">承認待ち一覧</h2>
-              <p class="text-xs text-dark/50 mt-0.5">コーチが確定申請した案件です。内容を確認し承認してください</p>
+              <p class="text-xs text-dark/50 mt-0.5">コーチが確定申請した案件です（面談種別ごとに表示）。内容を確認し承認してください</p>
             </div>
-            <div id="pendingList" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+            <div id="pendingList" class="space-y-6"></div>
             <p id="pendingEmpty" class="hidden text-sm text-dark/40 text-center py-16">承認待ちの案件はありません</p>
           </section>
 
@@ -581,9 +581,9 @@
           <section id="panel-needsNextCoach" class="admin-panel hidden fade-in">
             <div class="mb-4">
               <h2 class="text-lg font-bold text-dark">次点発生</h2>
-              <p class="text-xs text-dark/50 mt-0.5">コーチが全日程「対応不可」を選んだ案件です。次点コーチを選ぶと、生徒が入力済みの希望日時はそのまま使い回し、同じリンクで次点コーチに通知します</p>
+              <p class="text-xs text-dark/50 mt-0.5">コーチが全日程「対応不可」を選んだ案件です（面談種別ごとに表示）。次点コーチを選ぶと、生徒が入力済みの希望日時はそのまま使い回し、同じリンクで次点コーチに通知します</p>
             </div>
-            <div id="needsNextCoachList" class="grid grid-cols-1 lg:grid-cols-2 gap-3"></div>
+            <div id="needsNextCoachList" class="space-y-6"></div>
             <p id="needsNextCoachEmpty" class="hidden text-sm text-dark/40 text-center py-16">次点対応が必要な案件はありません</p>
           </section>
 
@@ -752,7 +752,7 @@
   <div id="approveModal" class="hidden fixed inset-0 z-50">
     <div id="approveModalBackdrop" class="absolute inset-0 bg-dark/60"></div>
     <div class="absolute inset-0 flex items-center justify-center p-4">
-      <div class="relative bg-white w-full max-w-sm md:max-w-3xl rounded-2xl shadow-2xl overflow-hidden">
+      <div class="relative bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden">
         <div class="px-5 py-4 bg-dark text-white">
           <p class="font-bold text-sm flex items-center gap-2"><span class="material-icons-round text-base">task_alt</span>この案件を承認します</p>
         </div>
@@ -817,7 +817,7 @@
   <div id="progressDetailModal" class="hidden fixed inset-0 z-50">
     <div id="progressDetailBackdrop" class="absolute inset-0 bg-dark/60"></div>
     <div class="absolute inset-0 flex items-center justify-center p-4">
-      <div class="relative bg-white w-full max-w-sm md:max-w-3xl rounded-2xl shadow-2xl overflow-hidden">
+      <div class="relative bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden">
         <div class="px-5 py-4 bg-dark text-white flex items-center justify-between">
           <p class="font-bold text-sm flex items-center gap-2"><span class="material-icons-round text-base">schedule</span>ステータス詳細</p>
           <button id="closeProgressDetailBtn" class="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition">
@@ -2574,31 +2574,44 @@ function renderPending(items){
   const wrap = $('pendingList');
   wrap.innerHTML = '';
   $('pendingEmpty').classList.toggle('hidden', items.length > 0);
-  items.forEach(it => {
-    const card = document.createElement('div');
-    card.className = 'bg-white border border-light rounded-xl p-4 flex items-start justify-between gap-2 shadow-sm';
-    card.innerHTML =
-      '<div class="text-xs leading-relaxed min-w-0">' +
-      '<p class="font-bold text-sm truncate">' + it.studentName + '<span class="text-dark/40 font-normal"> / ' + it.type + '</span></p>' +
-      '<p class="text-dark/60">担当: ' + it.coachName + '</p>' +
-      (it.createdBy ? '<p class="text-dark/40">起票者: ' + it.createdBy + '</p>' : '') +
-      '<p class="text-main font-bold">' + (it.slot ? fmtSlot(it.slot) : '（時間未取得）') + '</p>' +
-      '<button class="showLinksLinkBtn text-[11px] text-sub font-bold flex items-center gap-0.5 mt-1"><span class="material-icons-round text-sm">link</span>リンクを表示</button>' +
-      (it.courseChangeDetail ? '<button class="pendingCourseDetailBtn text-[11px] text-sub font-bold flex items-center gap-0.5 mt-1"><span class="material-icons-round text-sm">description</span>コース変更詳細</button>' : '') +
-      (it.coachChangeDetail ? '<button class="pendingCoachChangeDetailBtn text-[11px] text-sub font-bold flex items-center gap-0.5 mt-1"><span class="material-icons-round text-sm">description</span>コーチ変更詳細</button>' : '') +
-      '</div>' +
-      '<div class="shrink-0 flex flex-col items-end gap-1.5">' +
-      '<button class="approveBtn px-3 py-2 rounded-lg bg-cta text-white text-xs font-bold hover:brightness-105">承認</button>' +
-      '<button class="cancelBtn w-8 h-8 flex items-center justify-center rounded-lg bg-cta text-white hover:brightness-105 active:scale-95 transition shadow-sm" title="対応不要にする"><span class="material-icons-round text-lg">delete_outline</span></button>' +
-      '</div>';
-    card.querySelector('.approveBtn').onclick = () => openApproveModal(it.cid, card);
-    card.querySelector('.showLinksLinkBtn').onclick = () => openLinksModal(it.cid);
-    card.querySelector('.cancelBtn').onclick = () => cancelAssignmentPrompt(it.cid, () => card.remove());
-    const pendingCourseDetailBtn = card.querySelector('.pendingCourseDetailBtn');
-    if (pendingCourseDetailBtn) pendingCourseDetailBtn.onclick = () => openTextDetailModal('コース変更詳細', it.courseChangeDetail);
-    const pendingCoachChangeDetailBtn = card.querySelector('.pendingCoachChangeDetailBtn');
-    if (pendingCoachChangeDetailBtn) pendingCoachChangeDetailBtn.onclick = () => openTextDetailModal('コーチ変更詳細', it.coachChangeDetail);
-    wrap.appendChild(card);
+  if (!items || items.length === 0) return;
+
+  // 面談種別ごとにグループ化して表示する（進行中の調整・未確認アラートと共通の仕組み）
+  groupItemsByType(items).forEach((group) => {
+    const groupBox = document.createElement('div');
+    groupBox.appendChild(buildTypeGroupHeader(group.typeName, group.items.length));
+
+    const grid = document.createElement('div');
+    grid.className = 'grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3';
+    group.items.forEach(it => {
+      const card = document.createElement('div');
+      card.className = 'bg-white border border-light rounded-xl p-4 flex items-start justify-between gap-2 shadow-sm';
+      card.innerHTML =
+        '<div class="text-xs leading-relaxed min-w-0">' +
+        '<p class="font-bold text-sm truncate">' + it.studentName + '</p>' +
+        '<p class="text-dark/60">担当: ' + it.coachName + '</p>' +
+        (it.createdBy ? '<p class="text-dark/40">起票者: ' + it.createdBy + '</p>' : '') +
+        '<p class="text-main font-bold">' + (it.slot ? fmtSlot(it.slot) : '（時間未取得）') + '</p>' +
+        '<button class="showLinksLinkBtn text-[11px] text-sub font-bold flex items-center gap-0.5 mt-1"><span class="material-icons-round text-sm">link</span>リンクを表示</button>' +
+        (it.courseChangeDetail ? '<button class="pendingCourseDetailBtn text-[11px] text-sub font-bold flex items-center gap-0.5 mt-1"><span class="material-icons-round text-sm">description</span>コース変更詳細</button>' : '') +
+        (it.coachChangeDetail ? '<button class="pendingCoachChangeDetailBtn text-[11px] text-sub font-bold flex items-center gap-0.5 mt-1"><span class="material-icons-round text-sm">description</span>コーチ変更詳細</button>' : '') +
+        '</div>' +
+        '<div class="shrink-0 flex flex-col items-end gap-1.5">' +
+        '<button class="approveBtn px-3 py-2 rounded-lg bg-cta text-white text-xs font-bold hover:brightness-105">承認</button>' +
+        '<button class="cancelBtn w-8 h-8 flex items-center justify-center rounded-lg bg-cta text-white hover:brightness-105 active:scale-95 transition shadow-sm" title="対応不要にする"><span class="material-icons-round text-lg">delete_outline</span></button>' +
+        '</div>';
+      card.querySelector('.approveBtn').onclick = () => openApproveModal(it.cid, card);
+      card.querySelector('.showLinksLinkBtn').onclick = () => openLinksModal(it.cid);
+      card.querySelector('.cancelBtn').onclick = () => cancelAssignmentPrompt(it.cid, () => card.remove());
+      const pendingCourseDetailBtn = card.querySelector('.pendingCourseDetailBtn');
+      if (pendingCourseDetailBtn) pendingCourseDetailBtn.onclick = () => openTextDetailModal('コース変更詳細', it.courseChangeDetail);
+      const pendingCoachChangeDetailBtn = card.querySelector('.pendingCoachChangeDetailBtn');
+      if (pendingCoachChangeDetailBtn) pendingCoachChangeDetailBtn.onclick = () => openTextDetailModal('コーチ変更詳細', it.coachChangeDetail);
+      grid.appendChild(card);
+    });
+    groupBox.appendChild(grid);
+
+    wrap.appendChild(groupBox);
   });
 }
 
@@ -2752,6 +2765,19 @@ function renderAlerts(items){
   });
 }
 
+// 「進行中の調整」のステータスバッジの配色。ひと目で状態を見分けられるよう、
+// ステータスごとに色相を変える。カードの枠線（赤＝滞留 / オレンジ＝対象週が近い）は
+// 「急ぎかどうか」を示すものなので、そちらと混ざらない色を選んでいる。
+// FIX完了・終了通知送信済みは末尾に「（〇〇確認待ち）」が付くため、前方一致で判定する。
+function statusBadgeClass(status){
+  const s = String(status || '');
+  if (s === '生徒回答待ち') return 'bg-sky-100 text-sky-700';
+  if (s === 'コーチ回答待ち') return 'bg-indigo-100 text-indigo-700';
+  if (s.indexOf('FIX完了') === 0) return 'bg-emerald-100 text-emerald-700';
+  if (s.indexOf('終了通知送信済み') === 0) return 'bg-violet-100 text-violet-700';
+  return 'bg-light/60 text-dark/60';
+}
+
 function renderProgress(items){
   const wrap = $('progressList');
   wrap.innerHTML = '';
@@ -2793,7 +2819,7 @@ function renderProgress(items){
         '<p class="text-dark/40 text-[10px] mt-1">最終更新: ' + (it.statusUpdatedAt || '—') + '（' + it.daysSinceUpdate + '日経過）</p>' +
         warnText +
         '</div>' +
-        '<span class="shrink-0 px-2 py-1 rounded-full bg-sub/20 text-sub font-bold">' + it.status + '</span>';
+        '<span class="shrink-0 px-2 py-1 rounded-full font-bold ' + statusBadgeClass(it.status) + '">' + it.status + '</span>';
       card.onclick = () => openProgressDetail(it);
       grid.appendChild(card);
     });
@@ -2809,7 +2835,7 @@ function openProgressDetail(it){
   const lines = [];
   lines.push('<p><span class="text-dark/40">生徒：</span>' + it.studentName + '<span class="text-dark/40"> / 担当：</span>' + it.coachName + '</p>');
   lines.push('<p><span class="text-dark/40">面談種別：</span>' + it.type + '</p>');
-  lines.push('<p><span class="text-dark/40">現在のステータス：</span><span class="font-bold">' + it.status + '</span></p>');
+  lines.push('<p><span class="text-dark/40">現在のステータス：</span><span class="px-2 py-0.5 rounded-full text-xs font-bold ' + statusBadgeClass(it.status) + '">' + it.status + '</span></p>');
   if (it.createdAt) lines.push('<p><span class="text-dark/40">起票日時：</span>' + it.createdAt + '</p>');
   if (it.studentAnsweredAt) lines.push('<p><span class="text-dark/40">生徒回答日時：</span>' + it.studentAnsweredAt + '</p>');
   lines.push('<p><span class="text-dark/40">現在のステータスになった日時：</span>' + (it.statusUpdatedAt || '不明') + '（' + it.daysSinceUpdate + '日経過）</p>');
@@ -3102,76 +3128,89 @@ function renderNeedsNextCoach(items){
   const wrap = $('needsNextCoachList');
   wrap.innerHTML = '';
   $('needsNextCoachEmpty').classList.toggle('hidden', items.length > 0);
-  items.forEach(it => {
-    const uid = 'nextCoachCombo_' + (nextCoachComboCounter++);
-    const searchId = uid + '_search';
-    const hiddenId = uid + '_id';
-    const dropdownId = uid + '_dropdown';
+  if (!items || items.length === 0) return;
 
-    const card = document.createElement('div');
-    card.className = 'bg-white border border-light rounded-xl p-4 text-xs space-y-2 shadow-sm';
+  // 面談種別ごとにグループ化して表示する（進行中の調整・未確認アラートと共通の仕組み）
+  groupItemsByType(items).forEach((group) => {
+    const groupBox = document.createElement('div');
+    groupBox.appendChild(buildTypeGroupHeader(group.typeName, group.items.length));
 
-    const slotsHtml = (it.slots || []).map(s => '<li>' + fmtSlot(s) + '</li>').join('') || '<li>—</li>';
-    const isExpired = it.reasonKind === 'expired';
-    const tagHtml = isExpired
-      ? '<span class="shrink-0 px-2 py-0.5 rounded-full bg-sub/20 text-sub font-bold">回答期限切れ</span>'
-      : '<span class="shrink-0 px-2 py-0.5 rounded-full bg-cta/10 text-cta font-bold">全日程対応不可</span>';
+    const grid = document.createElement('div');
+    grid.className = 'grid grid-cols-1 lg:grid-cols-2 gap-3';
+    group.items.forEach(it => {
+      const uid = 'nextCoachCombo_' + (nextCoachComboCounter++);
+      const searchId = uid + '_search';
+      const hiddenId = uid + '_id';
+      const dropdownId = uid + '_dropdown';
 
-    card.innerHTML =
-      '<div class="flex items-center justify-between gap-2">' +
-        '<p class="font-bold text-sm truncate">' + it.studentName + '<span class="text-dark/40 font-normal"> / ' + it.type + '</span></p>' +
-        '<div class="flex items-center gap-1 shrink-0">' + tagHtml +
-        '<button class="cancelBtn w-7 h-7 flex items-center justify-center rounded-lg bg-cta text-white hover:brightness-105 active:scale-95 transition shadow-sm" title="対応不要にする"><span class="material-icons-round text-base">delete_outline</span></button>' +
+      const card = document.createElement('div');
+      card.className = 'bg-white border border-light rounded-xl p-4 text-xs space-y-2 shadow-sm';
+
+      const slotsHtml = (it.slots || []).map(s => '<li>' + fmtSlot(s) + '</li>').join('') || '<li>—</li>';
+      const isExpired = it.reasonKind === 'expired';
+      const tagHtml = isExpired
+        ? '<span class="shrink-0 px-2 py-0.5 rounded-full bg-sub/20 text-sub font-bold">回答期限切れ</span>'
+        : '<span class="shrink-0 px-2 py-0.5 rounded-full bg-cta/10 text-cta font-bold">全日程対応不可</span>';
+
+      card.innerHTML =
+        '<div class="flex items-center justify-between gap-2">' +
+          '<p class="font-bold text-sm truncate">' + it.studentName + '</p>' +
+          '<div class="flex items-center gap-1 shrink-0">' + tagHtml +
+          '<button class="cancelBtn w-7 h-7 flex items-center justify-center rounded-lg bg-cta text-white hover:brightness-105 active:scale-95 transition shadow-sm" title="対応不要にする"><span class="material-icons-round text-base">delete_outline</span></button>' +
+          '</div>' +
         '</div>' +
-      '</div>' +
-      '<p class="text-dark/60">対象週: ' + (it.targetWeek ? formatTargetWeek(it.targetWeek) : '—') + '</p>' +
-      '<p class="text-dark/60">' + (isExpired ? '回答期限が切れたコーチ: ' : '対応不可だったコーチ: ') + it.declinedCoachName + '</p>' +
-      (!isExpired && it.declineReason ? '<p class="text-cta font-bold">辞退理由: ' + it.declineReason + '</p>' : '') +
-      (it.candidateCoach ? '<p class="text-main">初回FIXシートのコーチ候補: ' + it.candidateCoach + '</p>' : '') +
-      (it.remarks ? '<p class="text-dark/60">備考: ' + it.remarks + '</p>' : '') +
-      '<button class="showLinksLinkBtn text-[11px] text-sub font-bold flex items-center gap-0.5"><span class="material-icons-round text-sm">link</span>リンクを表示</button>' +
-      '<div><p class="font-bold text-dark/50 mb-1">生徒の希望時間帯</p>' +
-      '<ul class="list-disc list-inside text-dark/70 space-y-0.5">' + slotsHtml + '</ul></div>' +
-      '<div class="pt-2 border-t border-light space-y-2">' +
-        '<div class="relative">' +
-          '<input id="' + searchId + '" type="text" autocomplete="off" placeholder="次点コーチを検索…" ' +
-            'class="w-full rounded-lg border border-light p-2 pr-8 text-xs focus:ring-2 focus:ring-sub bg-white" />' +
-          '<span class="material-icons-round absolute right-2 top-1/2 -translate-y-1/2 text-dark/30 text-base pointer-events-none">search</span>' +
-          '<input type="hidden" id="' + hiddenId + '" />' +
-          '<div id="' + dropdownId + '" class="hidden absolute z-30 mt-1 w-full max-h-48 overflow-y-auto bg-white border border-light rounded-lg shadow-lg"></div>' +
-        '</div>' +
-        '<button class="nextCoachSendBtn w-full px-3 py-2 rounded-lg bg-main text-white text-xs font-bold hover:bg-sub transition">次点コーチへ送信</button>' +
-      '</div>';
+        '<p class="text-dark/60">対象週: ' + (it.targetWeek ? formatTargetWeek(it.targetWeek) : '—') + '</p>' +
+        '<p class="text-dark/60">' + (isExpired ? '回答期限が切れたコーチ: ' : '対応不可だったコーチ: ') + it.declinedCoachName + '</p>' +
+        (!isExpired && it.declineReason ? '<p class="text-cta font-bold">辞退理由: ' + it.declineReason + '</p>' : '') +
+        (it.candidateCoach ? '<p class="text-main">初回FIXシートのコーチ候補: ' + it.candidateCoach + '</p>' : '') +
+        (it.remarks ? '<p class="text-dark/60">備考: ' + it.remarks + '</p>' : '') +
+        '<button class="showLinksLinkBtn text-[11px] text-sub font-bold flex items-center gap-0.5"><span class="material-icons-round text-sm">link</span>リンクを表示</button>' +
+        '<div><p class="font-bold text-dark/50 mb-1">生徒の希望時間帯</p>' +
+        '<ul class="list-disc list-inside text-dark/70 space-y-0.5">' + slotsHtml + '</ul></div>' +
+        '<div class="pt-2 border-t border-light space-y-2">' +
+          '<div class="relative">' +
+            '<input id="' + searchId + '" type="text" autocomplete="off" placeholder="次点コーチを検索…" ' +
+              'class="w-full rounded-lg border border-light p-2 pr-8 text-xs focus:ring-2 focus:ring-sub bg-white" />' +
+            '<span class="material-icons-round absolute right-2 top-1/2 -translate-y-1/2 text-dark/30 text-base pointer-events-none">search</span>' +
+            '<input type="hidden" id="' + hiddenId + '" />' +
+            '<div id="' + dropdownId + '" class="hidden absolute z-30 mt-1 w-full max-h-48 overflow-y-auto bg-white border border-light rounded-lg shadow-lg"></div>' +
+          '</div>' +
+          '<button class="nextCoachSendBtn w-full px-3 py-2 rounded-lg bg-main text-white text-xs font-bold hover:bg-sub transition">次点コーチへ送信</button>' +
+        '</div>';
 
-    // コンボボックスは対象のinput/dropdownがDOM上に存在してから初期化する必要があるため、先にappendする
-    wrap.appendChild(card);
-    card.querySelector('.showLinksLinkBtn').onclick = () => openLinksModal(it.cid);
-    card.querySelector('.cancelBtn').onclick = () => cancelAssignmentPrompt(it.cid, () => card.remove());
+      // コンボボックスは対象のinput/dropdownがDOM上に存在してから初期化する必要があるため、先にappendする
+      grid.appendChild(card);
+      card.querySelector('.showLinksLinkBtn').onclick = () => openLinksModal(it.cid);
+      card.querySelector('.cancelBtn').onclick = () => cancelAssignmentPrompt(it.cid, () => card.remove());
 
-    const nextCoachCombo = setupCombobox({
-      searchInputId: searchId, hiddenInputId: hiddenId, dropdownId: dropdownId,
-      formatLabel: (c) => c.name + '（' + c.id + '）',
+      const nextCoachCombo = setupCombobox({
+        searchInputId: searchId, hiddenInputId: hiddenId, dropdownId: dropdownId,
+        formatLabel: (c) => c.name + '（' + c.id + '）',
+      });
+      nextCoachCombo.setItems(coachListCache);
+
+      const sendBtn = card.querySelector('.nextCoachSendBtn');
+      sendBtn.onclick = () => {
+        const newCoachId = $(hiddenId).value;
+        if (!newCoachId) return showToast('候補から次点コーチを選択してください', true);
+        sendBtn.disabled = true;
+        sendBtn.textContent = '送信中…';
+        apiPost('reassignToNextCoach', { cid: it.cid, newCoachId })
+          .then(() => {
+            showToast('次点コーチへ送信しました');
+            card.remove();
+            loadDashboard();
+          })
+          .catch((err) => {
+            sendBtn.disabled = false;
+            sendBtn.textContent = '次点コーチへ送信';
+            showToast('送信に失敗しました: ' + err.message, true);
+          });
+      };
     });
-    nextCoachCombo.setItems(coachListCache);
+    groupBox.appendChild(grid);
 
-    const sendBtn = card.querySelector('.nextCoachSendBtn');
-    sendBtn.onclick = () => {
-      const newCoachId = $(hiddenId).value;
-      if (!newCoachId) return showToast('候補から次点コーチを選択してください', true);
-      sendBtn.disabled = true;
-      sendBtn.textContent = '送信中…';
-      apiPost('reassignToNextCoach', { cid: it.cid, newCoachId })
-        .then(() => {
-          showToast('次点コーチへ送信しました');
-          card.remove();
-          loadDashboard();
-        })
-        .catch((err) => {
-          sendBtn.disabled = false;
-          sendBtn.textContent = '次点コーチへ送信';
-          showToast('送信に失敗しました: ' + err.message, true);
-        });
-    };
+    wrap.appendChild(groupBox);
   });
 }
 </script>
