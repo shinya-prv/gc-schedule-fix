@@ -817,7 +817,7 @@
   <div id="progressDetailModal" class="hidden fixed inset-0 z-50">
     <div id="progressDetailBackdrop" class="absolute inset-0 bg-dark/60"></div>
     <div class="absolute inset-0 flex items-center justify-center p-4">
-      <div class="relative bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden">
+      <div class="relative bg-white w-full max-w-sm md:max-w-3xl rounded-2xl shadow-2xl overflow-hidden">
         <div class="px-5 py-4 bg-dark text-white flex items-center justify-between">
           <p class="font-bold text-sm flex items-center gap-2"><span class="material-icons-round text-base">schedule</span>ステータス詳細</p>
           <button id="closeProgressDetailBtn" class="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition">
@@ -2583,6 +2583,11 @@ function renderPending(items){
 
     const grid = document.createElement('div');
     grid.className = 'grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3';
+    // カード内のコンボボックス等は document.getElementById で自分自身を探すため、
+    // カードを追加する前に、グループの入れ物を先に画面へ挿入しておく必要がある。
+    groupBox.appendChild(grid);
+    wrap.appendChild(groupBox);
+
     group.items.forEach(it => {
       const card = document.createElement('div');
       card.className = 'bg-white border border-light rounded-xl p-4 flex items-start justify-between gap-2 shadow-sm';
@@ -2609,9 +2614,6 @@ function renderPending(items){
       if (pendingCoachChangeDetailBtn) pendingCoachChangeDetailBtn.onclick = () => openTextDetailModal('コーチ変更詳細', it.coachChangeDetail);
       grid.appendChild(card);
     });
-    groupBox.appendChild(grid);
-
-    wrap.appendChild(groupBox);
   });
 }
 
@@ -2701,6 +2703,11 @@ function renderAlerts(items){
 
     const grid = document.createElement('div');
     grid.className = 'grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3';
+    // カード内のコンボボックス等は document.getElementById で自分自身を探すため、
+    // カードを追加する前に、グループの入れ物を先に画面へ挿入しておく必要がある。
+    groupBox.appendChild(grid);
+    wrap.appendChild(groupBox);
+
     group.items.forEach(it => {
       const card = document.createElement('div');
       const weekLabel = formatTargetWeek(it.targetWeek);
@@ -2759,9 +2766,6 @@ function renderAlerts(items){
       };
       grid.appendChild(card);
     });
-    groupBox.appendChild(grid);
-
-    wrap.appendChild(groupBox);
   });
 }
 
@@ -2794,6 +2798,11 @@ function renderProgress(items){
 
     const grid = document.createElement('div');
     grid.className = 'grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3';
+    // カード内のコンボボックス等は document.getElementById で自分自身を探すため、
+    // カードを追加する前に、グループの入れ物を先に画面へ挿入しておく必要がある。
+    groupBox.appendChild(grid);
+    wrap.appendChild(groupBox);
+
     groupItems.forEach((it) => {
       const card = document.createElement('div');
       // 赤枠＝2日以上ステータスが変わっていない（stale）を優先表示し、
@@ -2823,9 +2832,6 @@ function renderProgress(items){
       card.onclick = () => openProgressDetail(it);
       grid.appendChild(card);
     });
-    groupBox.appendChild(grid);
-
-    wrap.appendChild(groupBox);
   });
 }
 
@@ -3137,6 +3143,11 @@ function renderNeedsNextCoach(items){
 
     const grid = document.createElement('div');
     grid.className = 'grid grid-cols-1 lg:grid-cols-2 gap-3';
+    // カード内のコンボボックス等は document.getElementById で自分自身を探すため、
+    // カードを追加する前に、グループの入れ物を先に画面へ挿入しておく必要がある。
+    groupBox.appendChild(grid);
+    wrap.appendChild(groupBox);
+
     group.items.forEach(it => {
       const uid = 'nextCoachCombo_' + (nextCoachComboCounter++);
       const searchId = uid + '_search';
@@ -3208,9 +3219,6 @@ function renderNeedsNextCoach(items){
           });
       };
     });
-    groupBox.appendChild(grid);
-
-    wrap.appendChild(groupBox);
   });
 }
 </script>
