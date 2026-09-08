@@ -47,6 +47,15 @@
         本ツールは、<strong>生徒の希望日時入力 → コーチの可能枠選択 → 運営の承認 → 自動確定連絡</strong>
         という4ステップで面談日程を調整する仕組みです。運営が「起票」することで、生徒用・コーチ用それぞれに専用のURLが発行されます。日時の選択はカレンダー画面から行い、コーチの回答には2日間の期限が設けられています。
       </div>
+      <div class="mt-3 bg-white border border-light rounded-xl p-4 text-sm leading-relaxed">
+        <p class="font-bold text-dark mb-1">面談種別について</p>
+        <p>基本の流れはすべての種別で共通ですが、以下の3種別は外部シートと連携しており、起票の手順と承認後の動きが少し異なります。</p>
+        <ul class="mt-2 space-y-1 text-xs text-dark/80">
+          <li>・<strong>担当コーチ_初回コーチング</strong>：外部「通常FIX」シートと連携</li>
+          <li>・<strong>運営_生徒面談（コーチ変更対応）</strong>：外部「コーチ変更_fix」シートと連携</li>
+          <li>・<strong>コース変更に伴うコーチ変更</strong>：外部「コース変更_fix」シートと連携</li>
+        </ul>
+      </div>
     </section>
 
     <!-- 全体フロー -->
@@ -92,6 +101,11 @@
         <p>⑥「この内容で送信する」を押すと完了。完了画面で今後の流れ（承認待ち→確定連絡→確認完了）を確認できる</p>
         <p class="text-dark/50 text-xs">※ 一度送信すると、同じリンクからの再送信はできない。内容の修正が必要な場合は運営に連絡する。</p>
       </div>
+      <div class="mt-3 bg-white border border-light rounded-xl p-4 text-sm space-y-2 leading-relaxed">
+        <p class="font-bold text-dark">担当コーチが変わる場合</p>
+        <p>コーチ変更・コース変更に伴う日程調整では、カレンダー画面の<strong>前に</strong>「担当コーチ変更のお知らせ」が表示される。いつまで現在のコーチとコーチングを行い、いつから新しい体制になるかを確認したうえで、日程の選択に進む。</p>
+        <p>コース変更でコーチが外れるだけ（新しいコーチとの日程調整が発生しない）の場合は、この画面ではなくメールで同じ内容が案内される。</p>
+      </div>
     </section>
 
     <!-- コーチ向け -->
@@ -108,6 +122,12 @@
         <p>⑥ この時点でステータスは「承認待ち」となり、運営の承認後に確定連絡メールが届く</p>
         <p class="text-dark/50 text-xs">※ 回答には<strong>2日間の期限</strong>があり、期限を過ぎるとリンクが失効し「期限切れのため回答権限がありません」と表示される。期限内に回答できない場合は、お早めに運営まで連絡する。</p>
       </div>
+      <div class="mt-3 bg-white border border-light rounded-xl p-4 text-sm space-y-2 leading-relaxed">
+        <p class="font-bold text-dark">担当が終了する場合（変更前のコーチ）</p>
+        <p>コーチ変更・コース変更で担当を外れる際は、「担当終了のお知らせ」メールが届く。日程調整の依頼ではなく、以下3点の確認と対応をお願いするもの。</p>
+        <p>① 最終コーチング日（〇/〇の週まで実施）／② 稼働報告・日程変更アプリでの引き継ぎ作成／③ 対象生徒とのグループLINEからの退出</p>
+        <p>確認したらメール内の「確認完了」を押す。押されるまで運営の管理画面に「旧コーチ確認待ち」として残る。</p>
+      </div>
     </section>
 
     <!-- 運営向け -->
@@ -122,7 +142,8 @@
         </div>
         <div>
           <p class="font-bold text-dark">■ 新規起票</p>
-          <p>面談種別・対象の生徒・担当コーチを選択し「起票してリンクを発行」を押すと、生徒用・コーチ用のURLが発行される。それぞれのリンクをコピーして本人に共有する。「担当コーチ_初回コーチング」を選んだ場合は、対象の生徒を選んだ後に外部シートの組み合わせ（対象週・コース・指導科目・コーチ候補）を選ぶ必要があり、組み合わせが無い場合は起票できない。</p>
+          <p>面談種別・対象の生徒・担当コーチを選択し「起票してリンクを発行」を押すと、生徒用・コーチ用のURLが発行される。それぞれのリンクをコピーして本人に共有する。</p>
+          <p class="mt-1">「担当コーチ_初回コーチング」「運営_生徒面談」「コース変更に伴うコーチ変更」の3種別は、対象の生徒を選んだ後に<strong>外部シートの組み合わせ</strong>（対象週・コース・指導科目・コーチ候補など）を選ぶ必要があり、組み合わせが無い場合は起票できない。組み合わせは生徒を選んだ時点で最新の内容を取得しているため、シート側で行が削除・追加されていても正しい行に紐づく。</p>
         </div>
         <div>
           <p class="font-bold text-dark">■ 進行中の調整</p>
@@ -134,7 +155,21 @@
         </div>
         <div>
           <p class="font-bold text-dark">■ 承認待ち一覧</p>
-          <p>コーチが確定申請した案件が一覧表示される。内容を確認し「承認」を押すと、承認者名を入力するダイアログが表示される。名前を入力して確定すると、ステータスが「確定」に更新され、生徒・コーチへ確定メールが自動送信される。「担当コーチ_初回コーチング」の案件は、外部の通常FIXシートへも自動的に転記される。</p>
+          <p>コーチが確定申請した案件が一覧表示される。内容を確認し「承認」を押すと、承認者名を入力するダイアログが表示される。名前を入力して確定すると、ステータスが「確定」に更新され、生徒・コーチへ確定メールが自動送信される。</p>
+          <p class="mt-1">外部シート連携のある種別は、承認と同時に該当シートへ確定コーチ名・曜日・時間が自動転記され、ステータス列も完了扱いに更新される（通常FIX／コーチ変更_fix／コース変更_fix）。コース変更でコーチが外れる行を含む場合は、このタイミングで変更前コーチへ担当終了のお知らせメールも自動送信される。</p>
+        </div>
+        <div>
+          <p class="font-bold text-dark">■ コーチ変更対応リスト</p>
+          <p>ヘッダー右上のボタンから開く。外部「コーチ変更_fix」シートのうち、まだ調整IDが発行されていない行が開始週の早い順に並ぶ。「この内容で起票する」を押すと、その行の内容が入った状態で新規起票フォームが開く。</p>
+        </div>
+        <div>
+          <p class="font-bold text-dark">■ コース変更に伴うコーチ変更対応リスト</p>
+          <p>ヘッダー右上のボタンから開く。外部「コース変更_fix」シートのうち、<strong>変更フラグ（M列）に「コーチ追加」または「コーチ除外」が入っている行だけ</strong>が表示される（コーチの入れ替わりを伴わない単なるコース変更は対象外）。フラグの内容によって、行に表示されるボタンが変わる。</p>
+          <p class="mt-2"><strong>「コーチ追加」を含む行 →「この内容で起票する」</strong></p>
+          <p>新しいコーチとの日程調整が必要な行。通常どおり起票し、生徒回答→コーチ回答→承認と進む。承認時に、コース変更_fixシートへ確定内容が自動転記される。同じ行に「コーチ除外」も入っている場合は、承認のタイミングで変更前コーチへ担当終了のお知らせメールも自動送信される。</p>
+          <p class="mt-2"><strong>「コーチ除外」のみの行 →「生徒・旧コーチへ担当終了通知を送信」</strong></p>
+          <p>新しいコーチが付かず、日程調整が発生しない行。起票は行わず、変更前コーチと生徒へお知らせメールを送るだけの軽い処理。送信すると一覧から消え、確認状況は「進行中の調整」タブで<strong>「終了通知送信済み（〇〇確認待ち）」</strong>として追える。</p>
+          <p class="mt-1 text-dark/50 text-xs">※ どちらのボタンも、処理が完了した行は一覧から自動的に除外される。同じ行を二重に処理する心配はない。</p>
         </div>
         <div>
           <p class="font-bold text-dark">■ 未確認アラート</p>
@@ -142,7 +177,7 @@
         </div>
         <div>
           <p class="font-bold text-dark">■ 初回FIXリストを表示・CRMへ記録する</p>
-          <p>ヘッダー右上のボタンから、外部の通常FIXシートでまだ調整IDが発行されていない行の一覧や、外部CRMへの記録画面（別タブ）を開ける。</p>
+          <p>ヘッダー右上のボタンから、外部の通常FIXシートでまだ調整IDが発行されていない行の一覧や、外部CRMへの記録画面（別タブ）を開ける。同じ並びに「コーチ変更対応リスト」「コース変更に伴うコーチ変更対応リスト」のボタンもある。</p>
         </div>
         <div>
           <p class="font-bold text-dark">■ リンクを表示</p>
@@ -165,9 +200,16 @@
             <tr class="border-b border-light/70"><td class="p-2 font-bold text-dark bg-light/30">確定</td><td class="p-2">承認済み・確定連絡メール送信済み</td></tr>
             <tr class="border-b border-light/70"><td class="p-2 font-bold text-dark bg-light/30">確認済み</td><td class="p-2">生徒・コーチ双方が確認完了</td></tr>
             <tr class="border-b border-light/70"><td class="p-2 font-bold text-dark bg-light/30">日程調整不可</td><td class="p-2">コーチが全枠対応不可を選択。次点コーチの検討が必要</td></tr>
-            <tr><td class="p-2 font-bold text-dark bg-light/30">回答期限切れ</td><td class="p-2">コーチが2日間反応しなかった、または運営が強制的に次点へ進めた。次点コーチの検討が必要</td></tr>
+            <tr class="border-b border-light/70"><td class="p-2 font-bold text-dark bg-light/30">回答期限切れ</td><td class="p-2">コーチが2日間反応しなかった、または運営が強制的に次点へ進めた。次点コーチの検討が必要</td></tr>
+            <tr><td class="p-2 font-bold text-dark bg-light/30">対応不要</td><td class="p-2">運営が取り下げた案件。各一覧・アラートには表示されず、記録としてのみ残る</td></tr>
           </tbody>
         </table>
+      </div>
+      <div class="mt-3 bg-white border border-light rounded-xl p-4 text-xs space-y-1 leading-relaxed">
+        <p class="font-bold text-dark text-sm">「進行中の調整」タブに出る表示</p>
+        <p>・<strong>FIX完了（〇〇確認待ち）</strong>：確定済みだが、生徒・コーチ・旧コーチのいずれかがまだ確認完了を押していない</p>
+        <p>・<strong>終了通知送信済み（〇〇確認待ち）</strong>：コース変更対応リストの「担当終了通知を送信」から作られた案件。日程調整は発生しない</p>
+        <p class="text-dark/50">確定から2日以上経過するか面談日が近づくと、これらは「未確認アラート」タブへ移動する。</p>
       </div>
     </section>
 
@@ -192,6 +234,44 @@
         <div class="bg-white border border-light rounded-xl p-4">
           <p class="font-bold">Q. 希望日時をすべて提示したがコーチの都合が合わない</p>
           <p class="text-dark/70 mt-1">コーチが「すべての日程で対応不可」を選択すると、運営の管理画面「次点発生」タブに自動的に表示されます。運営はそこから次点コーチを選んで、生徒の回答を再利用したまま同じ流れで調整を続けられます。</p>
+        </div>
+        <div class="bg-white border border-light rounded-xl p-4" data-role="admin">
+          <p class="font-bold">Q. 承認したのに、外部シートに転記されない</p>
+          <p class="text-dark/70 mt-1">転記先の列に「データの入力規則」（プルダウン）が設定され、無効な値のときの動作が「入力を拒否」になっていると、スクリプトからの書き込みが拒否されます。この場合は入力規則の設定を「警告を表示」に変更してください。あわせて、シート名や列位置が変更されていないかもご確認ください。</p>
+        </div>
+        <div class="bg-white border border-light rounded-xl p-4" data-role="admin">
+          <p class="font-bold">Q. 対応リストに、あるはずの行が表示されない</p>
+          <p class="text-dark/70 mt-1">各リストは「調整IDがまだ発行されていない行」だけを表示します。すでに起票済み、または担当終了通知を送信済みの行は自動的に除外されます。コース変更に伴うコーチ変更対応リストでは、これに加えて変更フラグ（M列）が空欄の行も対象外です。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 引き継ぎ担当者向け -->
+    <section data-role="admin">
+      <h2 class="font-bold text-main text-sm mb-3 flex items-center gap-1">
+        <span class="material-icons-round text-base">engineering</span>引き継ぎ担当者向けメモ
+      </h2>
+      <div class="bg-white border border-light rounded-xl p-4 text-sm space-y-3 leading-relaxed">
+        <div>
+          <p class="font-bold text-dark">■ システムの構成</p>
+          <p>画面（index.html）はVercelでホスティングし、データ保存とメール送信はGoogle Apps Script（コード.gs）が担う。接続先のGAS URLはVercel側の <code class="text-xs bg-light/40 px-1 rounded">config.js</code> で管理しており、index.html本体には書かれていない。</p>
+        </div>
+        <div>
+          <p class="font-bold text-dark">■ GASは「保存」と「デプロイ」が別物</p>
+          <p>コードを保存しただけでは、Webアプリの動作は変わらない。デプロイは作成時点のコードで固定されるため、修正のたびに「デプロイを管理」→ 対象デプロイの編集 → バージョンを<strong>「新バージョン」</strong>に変更して反映する必要がある。この操作ならURLは変わらないため、config.jsの修正は不要。</p>
+          <p class="mt-1 text-dark/50 text-xs">※ 新規デプロイを作るとURLが変わる。確定メール内の「確認完了」リンクはGASのURLを直接指しているため、旧デプロイを削除すると未確認のリンクが失効する点に注意。</p>
+        </div>
+        <div>
+          <p class="font-bold text-dark">■ 連携している外部スプレッドシート</p>
+          <p>通常FIX（担当コーチ_初回コーチング用）／コーチ変更_fix・コース変更_fix（同一ファイル内の別タブ）。いずれもシート名・列の位置をコード.gs内の定数で指定しているため、<strong>列の挿入・削除やシート名の変更は転記の失敗に直結する</strong>。変更する場合は必ずコード側の定数も合わせて修正する。</p>
+        </div>
+        <div>
+          <p class="font-bold text-dark">■ 転記が失敗したときの通知</p>
+          <p>外部シートへの転記やメール送信に失敗すると、運営宛（コード.gs内のADMIN_EMAILS）に「【要確認】」で始まる通知メールが届く。この場合は該当シートへ手動で転記し、原因を確認する。</p>
+        </div>
+        <div>
+          <p class="font-bold text-dark">■ トリガーの設定</p>
+          <p>コーチの回答期限切れ（2日間）を自動判定するため、GASエディタで <code class="text-xs bg-light/40 px-1 rounded">installExpiryTrigger</code> を一度だけ手動実行しておく必要がある。スクリプトを新しい環境へ移した場合は、この実行を忘れないこと。</p>
         </div>
       </div>
     </section>
@@ -219,18 +299,20 @@
 })();
 
 // URLパラメータ role（'admin' | 'student' | 'coach'）に応じて、
-// 関係のないロール向けセクション（data-role属性が一致しないもの）を非表示にする。
-// data-role="all" のセクションは常に表示する。パラメータが無い/不正な場合は全件表示。
+// 関係のないロール向けの要素（data-role属性が一致しないもの）を非表示にする。
+// セクション全体だけでなく、セクション内の個別の項目（よくある質問の一部など）にも
+// data-role を付けられるよう、section に限定せずすべての要素を対象にしている。
+// data-role="all" は常に表示する。パラメータが無い/不正な場合は全件表示。
 (function filterByRole(){
   const params = new URLSearchParams(window.location.search);
   const role = params.get('role');
   const validRoles = ['admin', 'student', 'coach'];
   if (!validRoles.includes(role)) return; // 直接manual.htmlを開いた場合などは全件表示のまま
 
-  document.querySelectorAll('section[data-role]').forEach((section) => {
-    const sectionRole = section.dataset.role;
-    if (sectionRole !== 'all' && sectionRole !== role) {
-      section.style.display = 'none';
+  document.querySelectorAll('[data-role]').forEach((el) => {
+    const elRole = el.dataset.role;
+    if (elRole !== 'all' && elRole !== role) {
+      el.style.display = 'none';
     }
   });
 
