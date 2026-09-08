@@ -561,9 +561,9 @@
           <section id="panel-alerts" class="admin-panel hidden fade-in">
             <div class="mb-4">
               <h2 class="text-lg font-bold text-dark">未確認アラート</h2>
-              <p class="text-xs text-dark/50 mt-0.5">確定日が近いのに、生徒またはコーチが未確認の案件です</p>
+              <p class="text-xs text-dark/50 mt-0.5">確定日が近いのに、生徒またはコーチが未確認の案件です（面談種別ごとに表示）</p>
             </div>
-            <div id="alertList" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3"></div>
+            <div id="alertList" class="space-y-6"></div>
             <p id="alertEmpty" class="hidden text-sm text-dark/40 text-center py-16">アラートはありません</p>
           </section>
 
@@ -825,6 +825,64 @@
           </button>
         </div>
         <div id="progressDetailContent" class="p-5 space-y-2 text-sm"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 進行中の調整：生徒の希望日時を運営が修正するモーダル -->
+  <div id="slotEditModal" class="hidden fixed inset-0 z-50">
+    <div id="slotEditBackdrop" class="absolute inset-0 bg-dark/60"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-3 md:p-6">
+      <div class="relative bg-white w-full max-w-2xl max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+        <div class="px-5 py-4 bg-dark text-white flex items-center justify-between shrink-0">
+          <p class="font-bold text-sm flex items-center gap-2"><span class="material-icons-round text-base">edit_calendar</span>生徒の希望日時を変更</p>
+          <button id="closeSlotEditBtn" class="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center transition">
+            <span class="material-icons-round">close</span>
+          </button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-5 space-y-4">
+          <div id="slotEditInfo" class="bg-light/50 border border-light rounded-xl p-3 text-xs leading-relaxed"></div>
+
+          <div id="slotEditBody" class="hidden space-y-3">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="text-sm font-bold text-dark">変更後の希望日時</label>
+                <span id="slotEditSummary" class="text-[11px] font-bold text-dark/40 shrink-0">曜日: 0　合計: 0.0h</span>
+              </div>
+              <p class="text-[11px] text-dark/40 mb-2">生徒が入力した内容があらかじめ塗られています。ドラッグで塗り足し・塗りつぶしの解除ができ、日付部分をタップするとその日を一括で選択/解除できます。</p>
+              <div id="slotEditOccupiedLegend" class="hidden flex flex-wrap gap-3 text-[10px] text-dark/50 mb-1.5">
+                <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded-sm" style="background:repeating-linear-gradient(135deg,#C7C9D9,#C7C9D9 3px,#DEDFEA 3px,#DEDFEA 6px)"></span>他の調整で確保済み（単発）</span>
+                <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded-sm" style="background:repeating-linear-gradient(135deg,#D9C2CE,#D9C2CE 3px,#EFDDE5 3px,#EFDDE5 6px)"></span>他の調整で確保済み（毎週固定）</span>
+              </div>
+              <div class="flex justify-center">
+                <button type="button" id="slotEditScrollUpBtn" aria-label="上へスクロール"
+                  class="w-10 h-7 rounded-t-lg border border-b-0 border-light bg-light/50 hover:bg-light active:bg-light flex items-center justify-center text-dark/50 transition">
+                  <span class="material-icons-round text-lg">keyboard_arrow_up</span>
+                </button>
+              </div>
+              <div id="slotEditCalendarScrollWrap" class="border border-light overflow-auto max-h-72">
+                <div id="slotEditCalendarGrid"></div>
+              </div>
+              <div class="flex justify-center">
+                <button type="button" id="slotEditScrollDownBtn" aria-label="下へスクロール"
+                  class="w-10 h-7 rounded-b-lg border border-t-0 border-light bg-light/50 hover:bg-light active:bg-light flex items-center justify-center text-dark/50 transition">
+                  <span class="material-icons-round text-lg">keyboard_arrow_down</span>
+                </button>
+              </div>
+            </div>
+
+            <label class="flex items-start gap-2 text-xs bg-light/30 border border-light rounded-lg p-3 cursor-pointer">
+              <input id="slotEditNotify" type="checkbox" checked class="mt-0.5 w-4 h-4 accent-[#207B97]" />
+              <span>変更した旨をコーチにメールで通知する<span class="block text-dark/40 mt-0.5">通知しない場合でも、コーチが調整リンクを開けば変更後の内容が表示されます。</span></span>
+            </label>
+
+            <button id="slotEditSaveBtn" type="button"
+              class="w-full py-3 rounded-lg bg-cta text-white font-bold shadow hover:brightness-105 active:scale-[.98] transition disabled:opacity-40 disabled:cursor-not-allowed">
+              この内容に変更する
+            </button>
+            <p class="text-[11px] text-dark/40 text-center">変更するとコーチの回答期限は再設定され、コーチ回答待ちとして最初から数え直されます。</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -2594,67 +2652,103 @@ $('approveModalConfirmBtn').onclick = confirmApprove;
 //   「承認を実行したい」場面が同じキー操作になってしまい、意図せず承認が実行される
 //   事故があったため、承認は必ず「承認する」ボタンのタップ経由のみで行う。
 
+// 「進行中の調整」「未確認アラート」で共通して使う、面談種別ごとのグループ化。
+// どの種別で滞留が起きているかを一目で把握できるようにするための表示上の分類で、
+// 種別名が空の案件は「その他」にまとめる。元の並び順（対象週順など）は維持する。
+function groupItemsByType(items){
+  const groups = {};
+  const order = [];
+  (items || []).forEach((it) => {
+    const key = it.type || 'その他';
+    if (!groups[key]) { groups[key] = []; order.push(key); }
+    groups[key].push(it);
+  });
+  return order.map((typeName) => ({ typeName: typeName, items: groups[typeName] }));
+}
+
+// 種別グループの見出し（種別名＋件数バッジ）を作る。
+function buildTypeGroupHeader(typeName, count){
+  const header = document.createElement('div');
+  header.className = 'flex items-center gap-2 mb-2';
+  header.innerHTML =
+    '<p class="text-xs font-bold text-dark/60">' + typeName + '</p>' +
+    '<span class="px-1.5 py-0.5 rounded-full bg-light/60 text-main text-[10px] font-bold">' + count + '件</span>';
+  return header;
+}
+
 function renderAlerts(items){
   const wrap = $('alertList');
   wrap.innerHTML = '';
   $('alertEmpty').classList.toggle('hidden', items.length > 0);
-  items.forEach(it => {
-    const card = document.createElement('div');
-    const weekLabel = formatTargetWeek(it.targetWeek);
-    // 対象週が近いことが理由でアラートに入った場合は残り日数、
-    // 対象週が未設定、または「確定連絡メールからの経過日数」が理由の場合はそちらを表示する。
-    const daysLabel = (it.overdueDays !== null && it.overdueDays !== undefined)
-      ? (it.overdueDays > 0 ? (it.overdueDays + '日超過') : (Math.abs(it.overdueDays) + '日前'))
-      : (it.daysSinceFixed !== null && it.daysSinceFixed !== undefined ? ('確定連絡から' + it.daysSinceFixed + '日経過') : '');
-    // 「コース変更対応リスト」の「担当終了通知を送信」（コーチ除外のみ）から作られた起票は、
-    // ENTRIES上の「コーチ」が実質「旧コーチ」を指すため、表示ラベルもそれに合わせる。
-    const isCourseChangeExitNotice = it.typeId === COURSE_CHANGE_TYPE_ID
-      && it.createdBy === COURSE_CHANGE_EXIT_NOTICE_CREATED_BY;
-    const coachLabel = isCourseChangeExitNotice ? '旧コーチ' : 'コーチ';
+  if (!items || items.length === 0) return;
 
-    card.className = 'bg-cta/10 border border-cta rounded-xl p-4 text-xs space-y-2';
-    card.innerHTML =
-      '<div class="flex items-start gap-2">' +
-      '<span class="material-icons-round text-cta text-lg shrink-0">warning</span>' +
-      '<div class="min-w-0 flex-1"><p class="font-bold">' + it.studentName + ' × ' + it.coachName + '</p>' +
-      '<p class="text-dark/60">確定日時: ' + (it.slot ? fmtSlot(it.slot) : '（時間未取得）') + '（対象週: ' + weekLabel + (daysLabel ? ' / ' + daysLabel : '') + '）　生徒:' + (it.studentConfirmed ? '済' : '未') + ' / ' + coachLabel + ':' + (it.coachConfirmed ? '済' : '未') + ((!isCourseChangeExitNotice && (it.typeId === COACH_CHANGE_TYPE_ID || (it.typeId === COURSE_CHANGE_TYPE_ID && it.hasCourseChangeOldCoach))) ? ' / 旧コーチ:' + (it.oldCoachConfirmed ? '済' : '未') : '') + '</p>' +
-      '<button class="showLinksLinkBtn text-[11px] text-sub font-bold flex items-center gap-0.5 mt-1"><span class="material-icons-round text-sm">link</span>リンクを表示</button>' +
-      '</div>' +
-      '<button class="cancelBtn shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-cta text-white hover:brightness-105 active:scale-95 transition shadow-sm" title="対応不要にする"><span class="material-icons-round text-lg">delete_outline</span></button>' +
-      '</div>' +
-      (it.courseChangeDetail || it.coachChangeDetail
-        ? '<div class="flex gap-2">' +
-          (it.courseChangeDetail ? '<button class="alertCourseDetailBtn flex-1 px-2 py-1.5 rounded-lg bg-white border border-light text-dark/70 text-[11px] font-bold hover:bg-light/40 transition flex items-center justify-center gap-1"><span class="material-icons-round text-sm">description</span>コース変更詳細</button>' : '') +
-          (it.coachChangeDetail ? '<button class="alertCoachChangeDetailBtn flex-1 px-2 py-1.5 rounded-lg bg-white border border-light text-dark/70 text-[11px] font-bold hover:bg-light/40 transition flex items-center justify-center gap-1"><span class="material-icons-round text-sm">description</span>コーチ変更詳細</button>' : '') +
-          '</div>'
-        : '') +
-      '<button class="resendConfirmBtn w-full px-3 py-2 rounded-lg bg-white border border-cta text-cta text-xs font-bold hover:bg-cta/10 transition flex items-center justify-center gap-1">' +
-      '<span class="material-icons-round text-sm">forward_to_inbox</span>確定連絡メールを再送</button>';
+  groupItemsByType(items).forEach((group) => {
+    const groupBox = document.createElement('div');
+    groupBox.appendChild(buildTypeGroupHeader(group.typeName, group.items.length));
 
-    card.querySelector('.showLinksLinkBtn').onclick = () => openLinksModal(it.cid);
-    card.querySelector('.cancelBtn').onclick = () => cancelAssignmentPrompt(it.cid, () => card.remove());
-    const alertCourseDetailBtn = card.querySelector('.alertCourseDetailBtn');
-    if (alertCourseDetailBtn) alertCourseDetailBtn.onclick = () => openTextDetailModal('コース変更詳細', it.courseChangeDetail);
-    const alertCoachChangeDetailBtn = card.querySelector('.alertCoachChangeDetailBtn');
-    if (alertCoachChangeDetailBtn) alertCoachChangeDetailBtn.onclick = () => openTextDetailModal('コーチ変更詳細', it.coachChangeDetail);
+    const grid = document.createElement('div');
+    grid.className = 'grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3';
+    group.items.forEach(it => {
+      const card = document.createElement('div');
+      const weekLabel = formatTargetWeek(it.targetWeek);
+      // 対象週が近いことが理由でアラートに入った場合は残り日数、
+      // 対象週が未設定、または「確定連絡メールからの経過日数」が理由の場合はそちらを表示する。
+      const daysLabel = (it.overdueDays !== null && it.overdueDays !== undefined)
+        ? (it.overdueDays > 0 ? (it.overdueDays + '日超過') : (Math.abs(it.overdueDays) + '日前'))
+        : (it.daysSinceFixed !== null && it.daysSinceFixed !== undefined ? ('確定連絡から' + it.daysSinceFixed + '日経過') : '');
+      // 「コース変更対応リスト」の「担当終了通知を送信」（コーチ除外のみ）から作られた起票は、
+      // ENTRIES上の「コーチ」が実質「旧コーチ」を指すため、表示ラベルもそれに合わせる。
+      const isCourseChangeExitNotice = it.typeId === COURSE_CHANGE_TYPE_ID
+        && it.createdBy === COURSE_CHANGE_EXIT_NOTICE_CREATED_BY;
+      const coachLabel = isCourseChangeExitNotice ? '旧コーチ' : 'コーチ';
 
-    const resendBtn = card.querySelector('.resendConfirmBtn');
-    resendBtn.onclick = () => {
-      resendBtn.disabled = true;
-      resendBtn.textContent = '送信中…';
-      apiPost('resendConfirmationEmail', { cid: it.cid })
-        .then(() => {
-          showToast('確定連絡メールを再送しました');
-          resendBtn.disabled = false;
-          resendBtn.innerHTML = '<span class="material-icons-round text-sm">forward_to_inbox</span>確定連絡メールを再送';
-        })
-        .catch((err) => {
-          resendBtn.disabled = false;
-          resendBtn.innerHTML = '<span class="material-icons-round text-sm">forward_to_inbox</span>確定連絡メールを再送';
-          showToast('再送に失敗しました: ' + err.message, true);
-        });
-    };
-    wrap.appendChild(card);
+      card.className = 'bg-cta/10 border border-cta rounded-xl p-4 text-xs space-y-2';
+      card.innerHTML =
+        '<div class="flex items-start gap-2">' +
+        '<span class="material-icons-round text-cta text-lg shrink-0">warning</span>' +
+        '<div class="min-w-0 flex-1"><p class="font-bold">' + it.studentName + ' × ' + it.coachName + '</p>' +
+        '<p class="text-dark/60">確定日時: ' + (it.slot ? fmtSlot(it.slot) : '（時間未取得）') + '（対象週: ' + weekLabel + (daysLabel ? ' / ' + daysLabel : '') + '）　生徒:' + (it.studentConfirmed ? '済' : '未') + ' / ' + coachLabel + ':' + (it.coachConfirmed ? '済' : '未') + ((!isCourseChangeExitNotice && (it.typeId === COACH_CHANGE_TYPE_ID || (it.typeId === COURSE_CHANGE_TYPE_ID && it.hasCourseChangeOldCoach))) ? ' / 旧コーチ:' + (it.oldCoachConfirmed ? '済' : '未') : '') + '</p>' +
+        '<button class="showLinksLinkBtn text-[11px] text-sub font-bold flex items-center gap-0.5 mt-1"><span class="material-icons-round text-sm">link</span>リンクを表示</button>' +
+        '</div>' +
+        '<button class="cancelBtn shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-cta text-white hover:brightness-105 active:scale-95 transition shadow-sm" title="対応不要にする"><span class="material-icons-round text-lg">delete_outline</span></button>' +
+        '</div>' +
+        (it.courseChangeDetail || it.coachChangeDetail
+          ? '<div class="flex gap-2">' +
+            (it.courseChangeDetail ? '<button class="alertCourseDetailBtn flex-1 px-2 py-1.5 rounded-lg bg-white border border-light text-dark/70 text-[11px] font-bold hover:bg-light/40 transition flex items-center justify-center gap-1"><span class="material-icons-round text-sm">description</span>コース変更詳細</button>' : '') +
+            (it.coachChangeDetail ? '<button class="alertCoachChangeDetailBtn flex-1 px-2 py-1.5 rounded-lg bg-white border border-light text-dark/70 text-[11px] font-bold hover:bg-light/40 transition flex items-center justify-center gap-1"><span class="material-icons-round text-sm">description</span>コーチ変更詳細</button>' : '') +
+            '</div>'
+          : '') +
+        '<button class="resendConfirmBtn w-full px-3 py-2 rounded-lg bg-white border border-cta text-cta text-xs font-bold hover:bg-cta/10 transition flex items-center justify-center gap-1">' +
+        '<span class="material-icons-round text-sm">forward_to_inbox</span>確定連絡メールを再送</button>';
+
+      card.querySelector('.showLinksLinkBtn').onclick = () => openLinksModal(it.cid);
+      card.querySelector('.cancelBtn').onclick = () => cancelAssignmentPrompt(it.cid, () => card.remove());
+      const alertCourseDetailBtn = card.querySelector('.alertCourseDetailBtn');
+      if (alertCourseDetailBtn) alertCourseDetailBtn.onclick = () => openTextDetailModal('コース変更詳細', it.courseChangeDetail);
+      const alertCoachChangeDetailBtn = card.querySelector('.alertCoachChangeDetailBtn');
+      if (alertCoachChangeDetailBtn) alertCoachChangeDetailBtn.onclick = () => openTextDetailModal('コーチ変更詳細', it.coachChangeDetail);
+
+      const resendBtn = card.querySelector('.resendConfirmBtn');
+      resendBtn.onclick = () => {
+        resendBtn.disabled = true;
+        resendBtn.textContent = '送信中…';
+        apiPost('resendConfirmationEmail', { cid: it.cid })
+          .then(() => {
+            showToast('確定連絡メールを再送しました');
+            resendBtn.disabled = false;
+            resendBtn.innerHTML = '<span class="material-icons-round text-sm">forward_to_inbox</span>確定連絡メールを再送';
+          })
+          .catch((err) => {
+            resendBtn.disabled = false;
+            resendBtn.innerHTML = '<span class="material-icons-round text-sm">forward_to_inbox</span>確定連絡メールを再送';
+            showToast('再送に失敗しました: ' + err.message, true);
+          });
+      };
+      grid.appendChild(card);
+    });
+    groupBox.appendChild(grid);
+
+    wrap.appendChild(groupBox);
   });
 }
 
@@ -2664,25 +2758,13 @@ function renderProgress(items){
   $('progressEmpty').classList.toggle('hidden', items.length > 0);
   if (!items || items.length === 0) return;
 
-  // 面談種別ごとにグループ化（種別名が空のものは「その他」にまとめる）
-  const groups = {};
-  const order = [];
-  items.forEach((it) => {
-    const key = it.type || 'その他';
-    if (!groups[key]) { groups[key] = []; order.push(key); }
-    groups[key].push(it);
-  });
-
-  order.forEach((typeName) => {
-    const groupItems = groups[typeName];
+  // 面談種別ごとにグループ化して表示する（未確認アラートと共通の仕組み）
+  groupItemsByType(items).forEach((group) => {
+    const typeName = group.typeName;
+    const groupItems = group.items;
     const groupBox = document.createElement('div');
 
-    const header = document.createElement('div');
-    header.className = 'flex items-center gap-2 mb-2';
-    header.innerHTML =
-      '<p class="text-xs font-bold text-dark/60">' + typeName + '</p>' +
-      '<span class="px-1.5 py-0.5 rounded-full bg-light/60 text-main text-[10px] font-bold">' + groupItems.length + '件</span>';
-    groupBox.appendChild(header);
+    groupBox.appendChild(buildTypeGroupHeader(typeName, groupItems.length));
 
     const grid = document.createElement('div');
     grid.className = 'grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3';
@@ -2760,7 +2842,11 @@ function openProgressDetail(it){
     '<span class="material-icons-round text-base">link</span>リンクを表示</button>';
   if (it.status === 'コーチ回答待ち') {
     actionHtml +=
-      '<button id="forceNextCoachBtn" type="button" class="w-full mt-2 py-2.5 rounded-lg bg-cta text-white text-sm font-bold hover:brightness-105 transition">' +
+      '<button id="editStudentSlotsBtn" type="button" class="w-full mt-2 py-2.5 rounded-lg border border-sub text-sub text-sm font-bold hover:bg-sub/10 transition flex items-center justify-center gap-1.5">' +
+      '<span class="material-icons-round text-base">edit_calendar</span>生徒の希望日時を変更する</button>' +
+      '<p class="text-[11px] text-dark/40 mt-1">生徒から「別の日にしたい」と連絡があった場合に、運営が代理で修正できます。コーチの調整リンクにも即座に反映されます。</p>';
+    actionHtml +=
+      '<button id="forceNextCoachBtn" type="button" class="w-full mt-3 py-2.5 rounded-lg bg-cta text-white text-sm font-bold hover:brightness-105 transition">' +
       '強制的に次点打診する</button>' +
       '<p class="text-[11px] text-dark/40 mt-1">現在のコーチのリンクは即座に無効になり、運営が次点コーチを選んで打診できるようになります（次点発生タブ）。</p>';
   }
@@ -2779,6 +2865,11 @@ function openProgressDetail(it){
   if (courseDetailBtn) courseDetailBtn.onclick = () => openTextDetailModal('コース変更詳細', it.courseChangeDetail);
   const coachChangeDetailBtn = document.getElementById('progressCoachChangeDetailBtn');
   if (coachChangeDetailBtn) coachChangeDetailBtn.onclick = () => openTextDetailModal('コーチ変更詳細', it.coachChangeDetail);
+
+  const editSlotsBtn = document.getElementById('editStudentSlotsBtn');
+  if (editSlotsBtn) {
+    editSlotsBtn.onclick = () => { closeProgressDetail(); openSlotEditModal(it); };
+  }
 
   const btn = document.getElementById('forceNextCoachBtn');
   if (btn) {
@@ -2806,6 +2897,131 @@ function closeProgressDetail(){
 }
 $('closeProgressDetailBtn').onclick = closeProgressDetail;
 $('progressDetailBackdrop').onclick = closeProgressDetail;
+
+// ========================= 生徒の希望日時を運営が修正する =========================
+// 生徒が回答したあとに「やっぱり別の日にしたい」と連絡が来た場合、運営が代理で
+// 希望日時を修正するためのモーダル。生徒画面とまったく同じカレンダー部品を使い、
+// 保存すると「生徒回答データ」の希望日時リストが上書きされるため、コーチが開いている
+// 調整リンクにもそのまま反映される。
+let slotEditDays = [];
+let slotEditSlots = [];
+// カレンダーのドラッグ操作は初回に一度だけバインドするため、この集合は毎回作り直さず、
+// モーダルを開くたびに中身だけを入れ替える（参照が変わるとハンドラが古い集合を見てしまうため）。
+const slotEditSelectedSet = new Set();
+let slotEditCid = null;
+let slotEditWired = false;
+
+function updateSlotEditSummary(){
+  const stats = calComputeStats(slotEditSelectedSet);
+  $('slotEditSummary').textContent =
+    '曜日: ' + stats.distinctDays + '　合計: ' + stats.totalHours.toFixed(1) + 'h';
+  $('slotEditSaveBtn').disabled = slotEditSelectedSet.size === 0;
+}
+
+// 対象週のカレンダーに加え、現在の希望日時に含まれる日付も必ず表示対象に含める
+// （対象週の外や過去の日付が選ばれている場合に、既存の選択が消えてしまわないようにするため）。
+function slotEditBuildDays(targetWeek, currentSlots){
+  const days = calGetDays(targetWeek);
+  const known = new Set(days.map(calDateToISO));
+  (currentSlots || []).forEach((s) => {
+    const m = String(s).match(/^(\d{4}-\d{2}-\d{2})/);
+    if (m && !known.has(m[1])) {
+      known.add(m[1]);
+      days.push(new Date(m[1] + 'T00:00:00'));
+    }
+  });
+  days.sort((a, b) => a.getTime() - b.getTime());
+  return days;
+}
+
+function openSlotEditModal(it){
+  slotEditCid = it.cid;
+  slotEditSelectedSet = new Set();
+  $('slotEditBody').classList.add('hidden');
+  $('slotEditInfo').innerHTML = '<p class="text-dark/50">読み込み中…</p>';
+  $('slotEditModal').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+
+  apiGet('getStudentSlotsForEdit', { cid: it.cid })
+    .then((data) => {
+      $('slotEditInfo').innerHTML =
+        '<p class="font-bold text-sm">' + data.studentName + ' <span class="text-dark/40 font-normal">/ 担当: ' + data.coachName + '</span></p>' +
+        '<p class="text-dark/50 mt-0.5">' + data.interviewType + (data.targetWeek ? '　対象週: ' + formatTargetWeek(data.targetWeek) : '') + '</p>' +
+        '<p class="mt-2 text-dark/40">現在の希望日時</p>' +
+        '<ul class="mt-0.5 space-y-0.5">' +
+        (data.slots || []).map((s) => '<li>・' + fmtSlot(s) + '</li>').join('') +
+        '</ul>' +
+        (data.remarks ? '<p class="mt-2 text-dark/40">生徒の備考</p><p class="whitespace-pre-wrap">' + data.remarks + '</p>' : '');
+
+      slotEditDays = slotEditBuildDays(data.targetWeek, data.slots);
+      slotEditSlots = calGetTimeSlots();
+      const grid = $('slotEditCalendarGrid');
+      calRenderGrid(grid, slotEditDays, slotEditSlots);
+      calApplyOccupiedBlocks(grid, slotEditDays, slotEditSlots, data.occupiedSlots);
+      $('slotEditOccupiedLegend').classList.toggle('hidden', !(data.occupiedSlots && data.occupiedSlots.length));
+
+      // 現在の希望日時を、あらかじめ選択済みの状態にしてから編集させる
+      slotEditSelectedSet.clear();
+      calHighlightKeysFromSlots(data.slots).forEach((key) => {
+        slotEditSelectedSet.add(key);
+        const cell = grid.querySelector('.cal-cell[data-key="' + key + '"]');
+        if (cell) cell.classList.add('is-selected');
+      });
+
+      // カレンダーのDOMはモーダルを開くたびに作り直すが、ドラッグ操作のリスナーは
+      // コンテナ（#slotEditCalendarGrid）自体に付くため、二重登録を避けて初回のみバインドする。
+      // 日付ヘッダーのタップは要素ごとに付け直す必要があるので毎回呼ぶ。
+      if (!slotEditWired) {
+        calMakeEditable(grid, slotEditSelectedSet, updateSlotEditSummary);
+        calWireScrollButtons('slotEditCalendarScrollWrap', 'slotEditScrollUpBtn', 'slotEditScrollDownBtn');
+        slotEditWired = true;
+      }
+      calMakeDayHeadersToggleable(grid, slotEditDays, slotEditSlots, slotEditSelectedSet, updateSlotEditSummary);
+
+      $('slotEditBody').classList.remove('hidden');
+      updateSlotEditSummary();
+    })
+    .catch((err) => {
+      $('slotEditInfo').innerHTML = '<p class="text-red-500 font-bold">読み込みに失敗しました</p><p class="text-dark/60 mt-1">' + err.message + '</p>';
+    });
+}
+
+function closeSlotEditModal(){
+  $('slotEditModal').classList.add('hidden');
+  document.body.style.overflow = '';
+  slotEditCid = null;
+}
+$('closeSlotEditBtn').onclick = closeSlotEditModal;
+$('slotEditBackdrop').onclick = closeSlotEditModal;
+
+$('slotEditSaveBtn').onclick = () => {
+  if (!slotEditCid) return;
+  const slots = calSerializeSelection(slotEditSelectedSet, slotEditDays, slotEditSlots);
+  if (slots.length === 0) {
+    showToast('希望日時を1件以上選択してください', true);
+    return;
+  }
+  const btn = $('slotEditSaveBtn');
+  btn.disabled = true;
+  btn.textContent = '変更中…';
+  apiPost('updateStudentSlots', {
+    cid: slotEditCid,
+    slots: slots,
+    notifyCoach: $('slotEditNotify').checked,
+  })
+    .then(() => {
+      showToast('希望日時を変更しました' + ($('slotEditNotify').checked ? '（コーチへ通知済み）' : ''));
+      closeSlotEditModal();
+      loadDashboard();
+    })
+    .catch((err) => {
+      showToast('変更に失敗しました: ' + err.message, true);
+    })
+    .finally(() => {
+      btn.disabled = false;
+      btn.textContent = 'この内容に変更する';
+    });
+};
 
 // ========================= 対応不要（キャンセル）共通処理 =========================
 // ステータス詳細・次点発生・承認待ち一覧・未確認アラートの各パネルから共通で呼び出す。
