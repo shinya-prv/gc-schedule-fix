@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- build: 2026-09-17-c （Vercelへの反映確認用の目印。動作には影響しません） -->
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -86,27 +87,27 @@
       </div>
       <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
         <button id="fixListBtn" type="button"
-           class="items-center gap-1 px-3 py-2 rounded-full border border-white/30 text-white text-xs font-bold hover:bg-white/10 active:scale-[.97] transition">
+           class="items-center gap-1 px-3 py-2 rounded-full border border-white/30 text-white text-xs font-bold whitespace-nowrap shrink-0 hover:bg-white/10 active:scale-[.97] transition">
           <span class="material-icons-round text-base leading-none">list_alt</span>
           初回FIXリスト
         </button>
         <button id="coachChangeListBtn" type="button"
-           class="items-center gap-1 px-3 py-2 rounded-full border border-white/30 text-white text-xs font-bold hover:bg-white/10 active:scale-[.97] transition">
+           class="items-center gap-1 px-3 py-2 rounded-full border border-white/30 text-white text-xs font-bold whitespace-nowrap shrink-0 hover:bg-white/10 active:scale-[.97] transition">
           <span class="material-icons-round text-base leading-none">switch_account</span>
-          コーチ変更対応リスト
+          コーチ変更リスト
         </button>
         <button id="courseChangeCoachListBtn" type="button"
-           class="items-center gap-1 px-3 py-2 rounded-full border border-white/30 text-white text-xs font-bold hover:bg-white/10 active:scale-[.97] transition">
+           class="items-center gap-1 px-3 py-2 rounded-full border border-white/30 text-white text-xs font-bold whitespace-nowrap shrink-0 hover:bg-white/10 active:scale-[.97] transition">
           <span class="material-icons-round text-base leading-none">move_up</span>
-          コース変更に伴うコーチ変更対応リスト
+          コース変更リスト
         </button>
         <a id="crmLink" href="https://gc-crm-two.vercel.app/" target="_blank" rel="noopener"
-           class="items-center gap-1 px-3 py-2 rounded-full border border-white/30 text-white text-xs font-bold hover:bg-white/10 active:scale-[.97] transition">
+           class="items-center gap-1 px-3 py-2 rounded-full border border-white/30 text-white text-xs font-bold whitespace-nowrap shrink-0 hover:bg-white/10 active:scale-[.97] transition">
           <span class="material-icons-round text-base leading-none">sync</span>
-          CRMへ記録する
+          CRMへ記録
         </a>
         <button id="openManualBtn"
-           class="flex items-center gap-1 px-2.5 sm:px-3 py-2 rounded-full bg-cta text-white text-xs font-bold shadow hover:brightness-105 active:scale-[.97] transition shrink-0">
+           class="flex items-center gap-1 px-2.5 sm:px-3 py-2 rounded-full bg-cta text-white text-xs font-bold whitespace-nowrap shadow hover:brightness-105 active:scale-[.97] transition shrink-0">
           <span class="material-icons-round text-base leading-none">menu_book</span>
           使い方
         </button>
@@ -385,6 +386,10 @@
         <div id="cfDone" class="hidden text-center space-y-2 pt-4">
           <span class="material-icons-round text-main text-3xl">task_alt</span>
           <p class="font-bold">確認済みにしました。ありがとうございました。</p>
+        </div>
+        <div class="bg-light/40 border border-light rounded-xl p-4 text-xs text-dark/60 leading-relaxed">
+          <p class="font-bold text-dark mb-0.5">この画面と確認メールは送信専用です</p>
+          <p>ご返信いただいてもお答えできません。本件に関するお問い合わせ・ご相談は、<span id="cfContactChannel" class="font-bold">Slackの業務報告チャンネル</span>までご連絡ください。</p>
         </div>
       </section>
 
@@ -2133,6 +2138,15 @@ function initConfirm(cid, target){
       renderStudentHandover(data.studentHandover);
       // コーチ用の確認完了画面にのみ、固定の案内テンプレート（2名体制引き継ぎ・宿題範囲）を表示する
       $('cfCoachNoticeBox').classList.toggle('hidden', target !== 'coach');
+      // 問い合わせ先は相手によって異なる（生徒・保護者はLINE、コーチはSlack）。
+      $('cfContactChannel').textContent = (target === 'student')
+        ? 'ご入塾後に追加いただいたLINE'
+        : 'Slackの業務報告チャンネル';
+      // 面談2日前のリマインドから来た場合は、確定連絡の確認ではなく「予定の確認」であることを明示する。
+      if (target === 'reminder') {
+        $('headerTitle').textContent = '面談予定の確認';
+        $('confirmBtn').textContent = '予定を確認しました';
+      }
       if (data.alreadyConfirmed) {
         $('confirmBtn').classList.add('hidden');
         $('cfDone').classList.remove('hidden');
@@ -2731,6 +2745,51 @@ function renderAlerts(items){
       const isCourseChangeExitNotice = it.typeId === COURSE_CHANGE_TYPE_ID
         && it.createdBy === COURSE_CHANGE_EXIT_NOTICE_CREATED_BY;
       const coachLabel = isCourseChangeExitNotice ? '旧コーチ' : 'コーチ';
+
+      // 面談が目前なのにコーチが面談リマインドを確認していない案件は、面談飛びに直結するため
+      // 赤枠＋専用の見出しで最優先に見せる（配列の先頭に入っているので各グループ内でも上に出る）。
+      if (it.reminderUrgent) {
+        const meetingLabel = it.daysUntilMeeting === 0 ? '本日'
+          : (it.daysUntilMeeting === 1 ? '明日' : (Math.abs(it.daysUntilMeeting) + '日前に実施予定だった'));
+        card.className = 'bg-red-50 border-2 border-red-500 rounded-xl p-4 text-xs space-y-2';
+        card.innerHTML =
+          '<div class="flex items-start gap-2">' +
+          '<span class="material-icons-round text-red-500 text-lg shrink-0">notification_important</span>' +
+          '<div class="min-w-0 flex-1">' +
+          '<p class="text-red-600 font-bold">面談前・コーチ未確認（' + meetingLabel + '）</p>' +
+          '<p class="font-bold mt-0.5">' + it.studentName + ' × ' + it.coachName + '</p>' +
+          '<p class="text-dark/60">面談日時: ' + (it.slot ? fmtSlot(it.slot) : '（時間未取得）') + '</p>' +
+          '<p class="text-dark/60">リマインド: ' + (it.reminderSentAt ? it.reminderSentAt + ' に送信済み・未確認' : '未送信') + '</p>' +
+          '<button class="showLinksLinkBtn text-[11px] text-sub font-bold flex items-center gap-0.5 mt-1"><span class="material-icons-round text-sm">link</span>リンクを表示</button>' +
+          '</div>' +
+          '<button class="cancelBtn shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-cta text-white hover:brightness-105 active:scale-95 transition shadow-sm" title="対応不要にする"><span class="material-icons-round text-lg">delete_outline</span></button>' +
+          '</div>' +
+          '<button class="resendReminderBtn w-full px-3 py-2 rounded-lg bg-red-500 text-white text-xs font-bold hover:brightness-105 transition flex items-center justify-center gap-1">' +
+          '<span class="material-icons-round text-sm">forward_to_inbox</span>面談リマインドを再送</button>' +
+          '<p class="text-[11px] text-dark/40 text-center">コーチが「予定を確認しました」を押すと、この案件は自動的に一覧から消えます。</p>';
+
+        card.querySelector('.showLinksLinkBtn').onclick = () => openLinksModal(it.cid);
+        card.querySelector('.cancelBtn').onclick = () => cancelAssignmentPrompt(it.cid, () => card.remove());
+        const reminderBtn = card.querySelector('.resendReminderBtn');
+        reminderBtn.onclick = () => {
+          reminderBtn.disabled = true;
+          reminderBtn.textContent = '送信中…';
+          apiPost('resendMeetingReminder', { cid: it.cid })
+            .then(() => {
+              showToast('面談リマインドを再送しました');
+              loadDashboard();
+            })
+            .catch((err) => {
+              showToast('再送に失敗しました: ' + err.message, true);
+            })
+            .finally(() => {
+              reminderBtn.disabled = false;
+              reminderBtn.innerHTML = '<span class="material-icons-round text-sm">forward_to_inbox</span>面談リマインドを再送';
+            });
+        };
+        grid.appendChild(card);
+        return;
+      }
 
       card.className = 'bg-cta/10 border border-cta rounded-xl p-4 text-xs space-y-2';
       card.innerHTML =
