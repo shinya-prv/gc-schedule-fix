@@ -102,6 +102,10 @@
         <p class="text-dark/50 text-xs">※ 一度送信すると、同じリンクからの再送信はできない。内容の修正が必要な場合は運営に連絡する。</p>
       </div>
       <div class="mt-3 bg-white border border-light rounded-xl p-4 text-sm space-y-2 leading-relaxed">
+        <p class="font-bold text-dark">メールへの返信について</p>
+        <p>このツールから届くメールは<strong>すべて送信専用</strong>で、返信しても運営には届かない。日程に関する質問・変更の相談は、<strong>入塾後に追加したLINE</strong>まで連絡する。</p>
+      </div>
+      <div class="mt-3 bg-white border border-light rounded-xl p-4 text-sm space-y-2 leading-relaxed">
         <p class="font-bold text-dark">担当コーチが変わる場合</p>
         <p>コーチ変更・コース変更に伴う日程調整では、カレンダー画面の<strong>前に</strong>「担当コーチ変更のお知らせ」が表示される。いつまで現在のコーチとコーチングを行い、いつから新しい体制になるかを確認したうえで、日程の選択に進む。</p>
         <p>コース変更でコーチが外れるだけ（新しいコーチとの日程調整が発生しない）の場合は、この画面ではなくメールで同じ内容が案内される。</p>
@@ -121,6 +125,16 @@
         <p>⑤ 通知先メールアドレスを確認し、「この内容で確定申請する」を押す</p>
         <p>⑥ この時点でステータスは「承認待ち」となり、運営の承認後に確定連絡メールが届く</p>
         <p class="text-dark/50 text-xs">※ 回答には<strong>2日間の期限</strong>があり、期限を過ぎるとリンクが失効し「期限切れのため回答権限がありません」と表示される。期限内に回答できない場合は、お早めに運営まで連絡する。</p>
+      </div>
+      <div class="mt-3 bg-white border border-light rounded-xl p-4 text-sm space-y-2 leading-relaxed">
+        <p class="font-bold text-dark">面談2日前のリマインド</p>
+        <p>日程が確定した後、面談の<strong>2日前</strong>に「面談リマインド」メールが届く。日時を確認し、メール内の<strong>「予定を確認しました」</strong>を押す。</p>
+        <p>前日になっても押されていない場合、運営の管理画面に最優先の案件として表示され、個別に連絡が入ることがある。日程の認識違いによる面談の欠席を防ぐための仕組みなので、確認だけは必ずお願いしたい。</p>
+        <p class="text-dark/50 text-xs">※ 担当コーチ_初回コーチングの場合、リマインドは1週目の面談についてのみ届く（2週目以降の毎週の面談は別ツールから通知される）。</p>
+      </div>
+      <div class="mt-3 bg-white border border-light rounded-xl p-4 text-sm space-y-2 leading-relaxed">
+        <p class="font-bold text-dark">メールへの返信について</p>
+        <p>このツールから届くメールは<strong>すべて送信専用</strong>で、返信しても運営には届かない。日程調整に関する質問・相談は、<strong>Slackの業務報告チャンネル</strong>まで連絡する。</p>
       </div>
       <div class="mt-3 bg-white border border-light rounded-xl p-4 text-sm space-y-2 leading-relaxed">
         <p class="font-bold text-dark">担当が終了する場合（変更前のコーチ）</p>
@@ -148,6 +162,8 @@
         <div>
           <p class="font-bold text-dark">■ 進行中の調整</p>
           <p>生徒またはコーチの回答待ちの案件を面談種別ごとに確認できる。ステータスが2日以上変わっていない案件は<strong>赤枠</strong>、対象週が近づいている案件は<strong>オレンジ枠</strong>で強調される。カードをタップすると詳細（各ステータスの完了日時）とリンク一覧を確認でき、コーチ回答待ちの案件はその場で「強制的に次点打診する」ことができる（実行すると即座に旧コーチのリンクが無効になる）。</p>
+          <p class="mt-1">生徒が回答したあとに「やっぱり別の日にしたい」と連絡があった場合は、詳細画面の<strong>「生徒の希望日時を変更する」</strong>から運営が代理で修正できる。生徒と同じカレンダーが開き、送信済みの希望日時があらかじめ塗られた状態で編集できる。保存するとコーチの調整リンクにも即座に反映され、コーチの回答期限は2日間で数え直しになる。変更をコーチにメールで知らせるかどうかは、保存前のチェックボックスで選べる。</p>
+          <p class="mt-1 text-dark/50 text-xs">※ この変更ができるのは「コーチ回答待ち」の案件のみ。コーチが既に日程を選んだ後（承認待ち以降）は、コーチの回答と食い違ってしまうため変更できない。その場合は一度「強制的に次点打診する」か「対応不要」にしてから起票し直す。</p>
         </div>
         <div>
           <p class="font-bold text-dark">■ 次点発生</p>
@@ -173,7 +189,9 @@
         </div>
         <div>
           <p class="font-bold text-dark">■ 未確認アラート</p>
-          <p>確定はしたが、生徒またはコーチがまだメール内の「確認完了」を押していない案件が表示される。「確定連絡メールを再送」で同じ内容を再送できる。</p>
+          <p>確定はしたが、生徒またはコーチがまだメール内の「確認完了」を押していない案件が、<strong>面談種別ごとにまとめて</strong>表示される（進行中の調整と同じ並び方）。どの種別で確認漏れが溜まっているかを把握しやすい。「確定連絡メールを再送」で同じ内容を再送できる。</p>
+          <p class="mt-2"><strong>「面談前・コーチ未確認」（赤枠）が最優先</strong></p>
+          <p>面談の2日前にコーチへ自動送信されるリマインドメールに対し、前日になっても「予定を確認しました」が押されていない案件が、赤枠で各グループの先頭に表示される。日程の認識違いによる面談の欠席を防ぐための枠で、確定連絡の確認が済んでいてもここに出る。「面談リマインドを再送」から念押しでき、コーチが確認を押せば自動的に一覧から消える。面談日から3日を過ぎた案件は表示されなくなる。</p>
         </div>
         <div>
           <p class="font-bold text-dark">■ 初回FIXリストを表示・CRMへ記録する</p>
@@ -271,7 +289,10 @@
         </div>
         <div>
           <p class="font-bold text-dark">■ トリガーの設定</p>
-          <p>コーチの回答期限切れ（2日間）を自動判定するため、GASエディタで <code class="text-xs bg-light/40 px-1 rounded">installExpiryTrigger</code> を一度だけ手動実行しておく必要がある。スクリプトを新しい環境へ移した場合は、この実行を忘れないこと。</p>
+          <p>以下2つのトリガーを、GASエディタで一度だけ手動実行して設定しておく必要がある。スクリプトを新しい環境へ移した場合は、どちらも忘れずに実行すること。</p>
+          <p class="mt-1">・<code class="text-xs bg-light/40 px-1 rounded">installExpiryTrigger</code>：コーチの回答期限切れ（2日間）を1時間おきに自動判定する</p>
+          <p>・<code class="text-xs bg-light/40 px-1 rounded">installMeetingReminderTrigger</code>：面談2日前のリマインドメールを毎朝8時台に自動送信する</p>
+          <p class="mt-1 text-dark/50 text-xs">※ リマインド機能には「ステータス管理」シートに<strong>リマインド送信日時／リマインド確認済みフラグ／リマインド確認日時</strong>の3列が必要。列が無い場合、トリガー実行時に不足している列名を示すエラーが出る。</p>
         </div>
       </div>
     </section>
