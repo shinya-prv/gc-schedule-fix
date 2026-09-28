@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- build: 2026-09-17-c （Vercelへの反映確認用の目印。動作には影響しません） -->
+<!-- build: 2026-09-28-a （Vercelへの反映確認用の目印。動作には影響しません） -->
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
@@ -2762,14 +2762,26 @@ function renderAlerts(items){
           '<p class="text-dark/60">リマインド: ' + (it.reminderSentAt ? it.reminderSentAt + ' に送信済み・未確認' : '未送信') + '</p>' +
           '<button class="showLinksLinkBtn text-[11px] text-sub font-bold flex items-center gap-0.5 mt-1"><span class="material-icons-round text-sm">link</span>リンクを表示</button>' +
           '</div>' +
-          '<button class="cancelBtn shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-cta text-white hover:brightness-105 active:scale-95 transition shadow-sm" title="対応不要にする"><span class="material-icons-round text-lg">delete_outline</span></button>' +
+          '<button class="dismissReminderBtn shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-dark/40 text-white hover:bg-dark/60 active:scale-95 transition shadow-sm" title="このアラートを解消する"><span class="material-icons-round text-lg">done_all</span></button>' +
           '</div>' +
           '<button class="resendReminderBtn w-full px-3 py-2 rounded-lg bg-red-500 text-white text-xs font-bold hover:brightness-105 transition flex items-center justify-center gap-1">' +
           '<span class="material-icons-round text-sm">forward_to_inbox</span>面談リマインドを再送</button>' +
-          '<p class="text-[11px] text-dark/40 text-center">コーチが「予定を確認しました」を押すと、この案件は自動的に一覧から消えます。</p>';
+          '<p class="text-[11px] text-dark/40 text-center">コーチが「予定を確認しました」を押すと、この案件は自動的に一覧から消えます。<br>別途連絡が取れた場合は、右上のチェックボタンでアラートを解消できます。</p>';
 
         card.querySelector('.showLinksLinkBtn').onclick = () => openLinksModal(it.cid);
-        card.querySelector('.cancelBtn').onclick = () => cancelAssignmentPrompt(it.cid, () => card.remove());
+        // このアラートは「面談は実施される前提」の案件に出るため、対応不要（案件の取り下げ）ではなく、
+        // リマインドの確認状況だけを解消する。案件のステータスや生徒・コーチのリンクは変わらない。
+        card.querySelector('.dismissReminderBtn').onclick = () => {
+          if (!confirm(it.studentName + 'さんの案件について、面談前アラートを解消します。\n'
+            + '（コーチと別途連絡が取れた場合などにお使いください）\n\n'
+            + '面談の予定・ステータスはそのまま残り、この赤枠のみ一覧から消えます。よろしいですか？')) return;
+          apiPost('dismissMeetingReminderAlert', { cid: it.cid })
+            .then(() => {
+              showToast('アラートを解消しました');
+              loadDashboard();
+            })
+            .catch((err) => showToast('処理に失敗しました: ' + err.message, true));
+        };
         const reminderBtn = card.querySelector('.resendReminderBtn');
         reminderBtn.onclick = () => {
           reminderBtn.disabled = true;
